@@ -1,963 +1,161 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Barbearia Hugo — Gerenciador de Cortes</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg:        #0d0d0d;
-      --surface:   #161616;
-      --card:      #1e1e1e;
-      --border:    #2a2a2a;
-      --gold:      #c9a84c;
-      --gold-dim:  #7a6228;
-      --gold-glow: rgba(201,168,76,0.15);
-      --red:       #d94f4f;
-      --green:     #4caf7d;
-      --text:      #e8e2d5;
-      --muted:     #7a7572;
-      --accent:    #c9a84c;
-      --radius:    10px;
-    }
+// =====================================================
+// GOOGLE APPS SCRIPT — Backend da Planilha
+// =====================================================
+// INSTRUÇÕES:
+// 1. Abra sua planilha no Google Sheets
+// 2. Vá em Extensões > Apps Script
+// 3. Apague todo o código que estiver lá
+// 4. Cole TODO este código
+// 5. Clique em "Implantar" > "Nova implantação"
+// 6. Tipo: "App da Web"
+// 7. Executar como: "Eu" (sua conta)
+// 8. Quem tem acesso: "Qualquer pessoa"
+// 9. Clique em "Implantar" e copie a URL gerada
+// 10. Cole essa URL no arquivo index.html (variável APPS_SCRIPT_URL)
+// =====================================================
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+const SHEET_NAME = "dashboard";
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ───────── LOGIN ───────── */
-    #login-screen {
-      position: fixed; inset: 0; z-index: 999;
-      background: var(--bg);
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column;
-      gap: 0;
-    }
-    .login-box {
-      width: min(380px, 92vw);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 48px 40px 40px;
-      box-shadow: 0 0 60px rgba(201,168,76,0.08);
-      text-align: center;
-      animation: fadeUp .5s ease both;
-    }
-    .login-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 42px;
-      letter-spacing: 4px;
-      color: var(--gold);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .login-sub {
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 36px;
-    }
-    .login-box label {
-      display: block;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-      text-align: left;
-    }
-    .login-box input {
-      width: 100%;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 13px 16px;
-      font-family: 'DM Mono', monospace;
-      font-size: 15px;
-      color: var(--text);
-      outline: none;
-      transition: border-color .2s;
-      margin-bottom: 24px;
-    }
-    .login-box input:focus { border-color: var(--gold); }
-    .btn-gold {
-      width: 100%;
-      background: var(--gold);
-      color: #0d0d0d;
-      border: none;
-      border-radius: var(--radius);
-      padding: 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: opacity .2s, transform .1s;
-    }
-    .btn-gold:hover { opacity: .88; }
-    .btn-gold:active { transform: scale(.98); }
-    .login-error {
-      color: var(--red);
-      font-size: 13px;
-      margin-top: 14px;
-      display: none;
-    }
-
-    /* ───────── APP SHELL ───────── */
-    #app { display: none; }
-
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 32px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      position: sticky; top: 0; z-index: 100;
-    }
-    .header-logo { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; color: var(--gold); }
-    .header-right { display: flex; gap: 12px; align-items: center; }
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 8px 16px;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      cursor: pointer;
-      transition: border-color .2s, color .2s;
-    }
-    .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
-    .btn-primary {
-      background: var(--gold);
-      border: none;
-      border-radius: var(--radius);
-      padding: 9px 20px;
-      color: #0d0d0d;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      transition: opacity .2s;
-    }
-    .btn-primary:hover { opacity: .85; }
-
-    main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
-
-    /* ───────── STATS ───────── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 36px;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 22px;
-      transition: border-color .2s;
-    }
-    .stat-card:hover { border-color: var(--gold-dim); }
-    .stat-label {
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .stat-value {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 36px;
-      letter-spacing: 1px;
-      color: var(--text);
-      line-height: 1;
-    }
-    .stat-value.gold { color: var(--gold); }
-    .stat-value.red  { color: var(--red); }
-    .stat-value.green { color: var(--green); }
-
-    /* ───────── SECTION HEADER ───────── */
-    .section-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    .section-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
-      letter-spacing: 2px;
-      color: var(--text);
-    }
-
-    /* ───────── TABLE ───────── */
-    .table-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 36px;
-    }
-    table { width: 100%; border-collapse: collapse; }
-    thead tr { background: var(--card); }
-    thead th {
-      padding: 14px 18px;
-      text-align: left;
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 500;
-      white-space: nowrap;
-    }
-    tbody tr {
-      border-top: 1px solid var(--border);
-      transition: background .15s;
-    }
-    tbody tr:hover { background: var(--card); }
-    tbody td {
-      padding: 14px 18px;
-      font-size: 14px;
-      color: var(--text);
-      vertical-align: middle;
-    }
-    .badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .5px;
-      text-transform: uppercase;
-    }
-    .badge-pending  { background: rgba(201,168,76,.12); color: var(--gold); border: 1px solid var(--gold-dim); }
-    .badge-paid     { background: rgba(76,175,125,.12); color: var(--green); border: 1px solid rgba(76,175,125,.3); }
-    .badge-partial  { background: rgba(217,79,79,.12);  color: var(--red);   border: 1px solid rgba(217,79,79,.3); }
-
-    .action-btn {
-      background: none; border: 1px solid var(--border); border-radius: 6px;
-      padding: 5px 10px; font-size: 12px; cursor: pointer;
-      color: var(--muted); transition: all .15s; margin-right: 4px;
-    }
-    .action-btn:hover { border-color: var(--gold); color: var(--gold); }
-    .action-btn.danger:hover { border-color: var(--red); color: var(--red); }
-
-    /* ───────── MODAL ───────── */
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 200;
-      background: rgba(0,0,0,.7);
-      backdrop-filter: blur(4px);
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px;
-      display: none;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 36px;
-      width: min(520px, 100%);
-      max-height: 90vh;
-      overflow-y: auto;
-      animation: fadeUp .3s ease both;
-    }
-    .modal-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 26px; letter-spacing: 2px;
-      color: var(--gold); margin-bottom: 24px;
-    }
-    .form-row { margin-bottom: 18px; }
-    .form-row label {
-      display: block;
-      font-size: 11px; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .form-row input, .form-row select, .form-row textarea {
-      width: 100%;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      color: var(--text);
-      outline: none;
-      transition: border-color .2s;
-    }
-    .form-row input:focus,
-    .form-row select:focus,
-    .form-row textarea:focus { border-color: var(--gold); }
-    .form-row select option { background: var(--card); }
-    .form-row textarea { resize: vertical; min-height: 80px; }
-    .form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
-
-    /* ───────── PENDING GROUP ───────── */
-    .pending-block {
-      background: linear-gradient(135deg, rgba(201,168,76,.07), transparent);
-      border: 1px solid var(--gold-dim);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-bottom: 16px;
-    }
-    .pending-block-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .pending-block-title { font-weight: 600; font-size: 15px; }
-    .pending-total { font-family: 'DM Mono', monospace; font-size: 20px; color: var(--gold); }
-
-    /* ───────── EMPTY STATE ───────── */
-    .empty {
-      text-align: center;
-      padding: 64px 24px;
-      color: var(--muted);
-    }
-    .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .4; }
-    .empty p { font-size: 14px; }
-
-    /* ───────── TOAST ───────── */
-    #toast {
-      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 30px;
-      padding: 12px 24px;
-      font-size: 13px;
-      color: var(--text);
-      z-index: 999;
-      box-shadow: 0 8px 30px rgba(0,0,0,.4);
-      opacity: 0;
-      transition: opacity .3s;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    #toast.show { opacity: 1; }
-
-    /* ───────── FILTER BAR ───────── */
-    .filter-bar {
-      display: flex; gap: 8px; flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-    .filter-btn {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 6px 16px;
-      font-size: 12px;
-      letter-spacing: .5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .filter-btn.active, .filter-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
-
-    /* ───────── INSTRUCTIONS ───────── */
-    .instructions {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--gold);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-bottom: 32px;
-      font-size: 13px;
-      line-height: 1.7;
-      color: var(--muted);
-    }
-    .instructions strong { color: var(--text); }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 640px) {
-      header { padding: 14px 16px; }
-      main { padding: 20px 12px 60px; }
-      .form-2col { grid-template-columns: 1fr; }
-      .modal { padding: 24px 18px; }
-      thead th:nth-child(4),
-      tbody td:nth-child(4) { display: none; }
-    }
-  </style>
-</head>
-<body>
-
-<!-- ══════════════ LOGIN ══════════════ -->
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">HUGO'S</div>
-    <div class="login-sub">Barbearia · Gerenciador</div>
-    <label>Senha de acesso</label>
-    <input type="password" id="pwd-input" placeholder="••••••••••" autocomplete="current-password"/>
-    <button class="btn-gold" onclick="doLogin()">Entrar</button>
-    <div class="login-error" id="login-error">Senha incorreta. Tente novamente.</div>
-  </div>
-</div>
-
-<!-- ══════════════ APP ══════════════ -->
-<div id="app">
-  <header>
-    <div class="header-logo">✂ HUGO'S</div>
-    <div class="header-right">
-      <button class="btn-outline" onclick="openSyncModal()">https://docs.google.com/spreadsheets/d/e/2PACX-1vRo-CLB0__unjyN2Wq6t9r9vq5Fknj3vxXbws-ErK0suF3QtMbRlRgK02McDW2gBIwJlRqpPnxA9QV4/pub?output=csv</button>
-      <button class="btn-primary" onclick="openAddModal()">+ Novo Corte</button>
-      <button class="btn-outline" onclick="doLogout()" style="border-color:transparent;color:var(--muted)">Sair</button>
-    </div>
-  </header>
-
-  <main>
-
-    <!-- INSTRUÇÃO DE USO -->
-    <div class="instructions" id="setup-notice">
-      <strong>⚡ Como configurar a planilha:</strong> Abra sua planilha no Google Sheets e crie os seguintes cabeçalhos na aba <strong>dashboard</strong> (linha 1):
-      <br><br>
-      <code style="color:var(--gold); font-family:'DM Mono',monospace;">
-        A1: ID &nbsp;|&nbsp; B1: Data &nbsp;|&nbsp; C1: Tipo de Corte &nbsp;|&nbsp; D1: Preço &nbsp;|&nbsp; E1: Status &nbsp;|&nbsp; F1: Data Pagamento &nbsp;|&nbsp; G1: Nota Fiscal &nbsp;|&nbsp; H1: Observações
-      </code>
-      <br><br>
-      Depois, publique a planilha em <strong>Arquivo → Compartilhar → Publicar na web</strong> (formato CSV), copie o link CSV e cole em <strong>"↕ Sync Planilha"</strong>. Os dados são salvos localmente no navegador em tempo real.
-      <br><br>
-      <span style="font-size:11px">💡 Dica: você pode fechar este aviso clicando no botão abaixo depois de configurar.</span>
-      <br><br>
-      <button class="btn-outline" style="font-size:12px" onclick="document.getElementById('setup-notice').style.display='none'">Fechar aviso</button>
-    </div>
-
-    <!-- STATS -->
-    <div class="stats-grid" id="stats-grid"></div>
-
-    <!-- PENDENTES / A PAGAR -->
-    <div class="section-header">
-      <div class="section-title">💰 Pendentes de pagamento</div>
-    </div>
-    <div id="pending-section"></div>
-
-    <!-- TABELA COMPLETA -->
-    <div class="section-header" style="margin-top:36px">
-      <div class="section-title">📋 Histórico de Cortes</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="text" id="search-input" placeholder="Buscar…" oninput="renderTable()"
-          style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;font-size:13px;color:var(--text);outline:none;width:160px"/>
-      </div>
-    </div>
-
-    <div class="filter-bar">
-      <button class="filter-btn active" data-filter="all"   onclick="setFilter(this,'all')">Todos</button>
-      <button class="filter-btn"        data-filter="pending" onclick="setFilter(this,'pending')">Pendentes</button>
-      <button class="filter-btn"        data-filter="paid"   onclick="setFilter(this,'paid')">Pagos</button>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Data</th>
-            <th>Tipo de Corte</th>
-            <th>Preço</th>
-            <th>Status</th>
-            <th>Pago em</th>
-            <th>Nota Fiscal</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="cuts-tbody"></tbody>
-      </table>
-      <div class="empty" id="empty-state" style="display:none">
-        <div class="empty-icon">✂</div>
-        <p>Nenhum corte registrado ainda.<br>Clique em <strong>+ Novo Corte</strong> para começar.</p>
-      </div>
-    </div>
-
-  </main>
-</div>
-
-<!-- ══════════════ MODAL: NOVO/EDITAR CORTE ══════════════ -->
-<div class="modal-overlay" id="add-modal">
-  <div class="modal">
-    <div class="modal-title" id="modal-title-text">Novo Corte</div>
-    <input type="hidden" id="edit-id"/>
-    <div class="form-2col">
-      <div class="form-row">
-        <label>Data do Corte</label>
-        <input type="date" id="f-date"/>
-      </div>
-      <div class="form-row">
-        <label>Preço (R$)</label>
-        <input type="number" id="f-price" placeholder="35.00" step="0.50" min="0"/>
-      </div>
-    </div>
-    <div class="form-row">
-      <label>Tipo de Corte</label>
-      <select id="f-type">
-        <option value="">— Selecione —</option>
-        <option>Máquina</option>
-        <option>Tesoura</option>
-        <option>Degradê</option>
-        <option>Social</option>
-        <option>Navalhado</option>
-        <option>Barba</option>
-        <option>Corte + Barba</option>
-        <option>Corte Infantil</option>
-        <option>Outro</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label>Observações</label>
-      <textarea id="f-notes" placeholder="Alguma observação sobre este corte…"></textarea>
-    </div>
-    <div class="form-row">
-      <label>Status</label>
-      <select id="f-status">
-        <option value="pending">Pendente</option>
-        <option value="paid">Pago</option>
-      </select>
-    </div>
-    <div id="payment-fields" style="display:none">
-      <div class="form-2col">
-        <div class="form-row">
-          <label>Data do Pagamento</label>
-          <input type="date" id="f-paydate"/>
-        </div>
-        <div class="form-row">
-          <label>Nota Fiscal / Nº</label>
-          <input type="text" id="f-invoice" placeholder="NF-001 ou URL"/>
-        </div>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-outline" onclick="closeModal('add-modal')">Cancelar</button>
-      <button class="btn-primary" onclick="saveCut()">Salvar Corte</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ MODAL: CONFIRMAR PAGAMENTO ══════════════ -->
-<div class="modal-overlay" id="pay-modal">
-  <div class="modal">
-    <div class="modal-title">Confirmar Pagamento</div>
-    <input type="hidden" id="pay-id"/>
-    <p style="color:var(--muted);font-size:14px;margin-bottom:24px">Informe os detalhes do pagamento para registrar na planilha.</p>
-    <div class="form-row">
-      <label>Data do Pagamento</label>
-      <input type="date" id="p-paydate"/>
-    </div>
-    <div class="form-row">
-      <label>Nota Fiscal / Nº Comprovante</label>
-      <input type="text" id="p-invoice" placeholder="NF-001, PIX, etc."/>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-outline" onclick="closeModal('pay-modal')">Cancelar</button>
-      <button class="btn-primary" onclick="confirmPayment()">✓ Confirmar Pagamento</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ MODAL: SYNC / CSV ══════════════ -->
-<div class="modal-overlay" id="sync-modal">
-  <div class="modal">
-    <div class="modal-title">Sincronizar com Google Sheets</div>
-    <p style="color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.7">
-      Para importar dados da planilha, publique-a como <strong>CSV</strong> no Google Sheets:<br>
-      <em>Arquivo → Compartilhar → Publicar na Web → Selecione a aba "dashboard" → Formato CSV → Publicar</em>
-    </p>
-    <div class="form-row">
-      <label>URL CSV da Planilha</label>
-      <input type="url" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/e/…/pub?output=csv"/>
-    </div>
-    <div style="margin-bottom:12px;font-size:12px;color:var(--muted)">
-      URL salva: <span id="saved-url" style="color:var(--gold)">nenhuma</span>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-outline" onclick="closeModal('sync-modal')">Fechar</button>
-      <button class="btn-outline" onclick="loadFromSheet()">⬇ Importar da Planilha</button>
-      <button class="btn-primary" onclick="exportToCSV()">⬆ Exportar CSV</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div id="toast"></div>
-
-<script>
-/* ══════════════════════════════════════════════
-   STORAGE & STATE
-══════════════════════════════════════════════ */
-const STORAGE_KEY = 'hugos_cuts';
-const URL_KEY     = 'hugos_sheet_url';
-let cuts = [];
-let activeFilter = 'all';
-
-function load() {
-  try { cuts = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-  catch { cuts = []; }
-}
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(cuts));
-}
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+function doGet(e) {
+  return handleRequest(e);
 }
 
-/* ══════════════════════════════════════════════
-   LOGIN
-══════════════════════════════════════════════ */
-const PASSWORD = 'Matheus123';
-function doLogin() {
-  const v = document.getElementById('pwd-input').value;
-  if (v === PASSWORD) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    init();
-  } else {
-    document.getElementById('login-error').style.display = 'block';
-    document.getElementById('pwd-input').value = '';
-  }
-}
-document.getElementById('pwd-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-function doLogout() {
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('pwd-input').value = '';
+function doPost(e) {
+  return handleRequest(e);
 }
 
-/* ══════════════════════════════════════════════
-   INIT
-══════════════════════════════════════════════ */
-function init() {
-  load();
-  const savedUrl = localStorage.getItem(URL_KEY);
-  if (savedUrl) {
-    document.getElementById('sheet-url').value = savedUrl;
-    document.getElementById('saved-url').textContent = savedUrl.slice(0,50)+'…';
-  }
-  // set today's date in forms
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('f-date').value    = today;
-  document.getElementById('p-paydate').value = today;
-  renderAll();
-}
+function handleRequest(e) {
+  const params = e.parameter;
+  const action = params.action;
 
-/* ══════════════════════════════════════════════
-   RENDER
-══════════════════════════════════════════════ */
-function renderAll() {
-  renderStats();
-  renderPending();
-  renderTable();
-}
+  let result;
 
-function renderStats() {
-  const total      = cuts.length;
-  const paid       = cuts.filter(c => c.status === 'paid').length;
-  const pending    = cuts.filter(c => c.status === 'pending').length;
-  const totalR$    = cuts.reduce((s,c) => s + parseFloat(c.price||0), 0);
-  const paidR$     = cuts.filter(c=>c.status==='paid').reduce((s,c)=>s+parseFloat(c.price||0),0);
-  const pendingR$  = cuts.filter(c=>c.status==='pending').reduce((s,c)=>s+parseFloat(c.price||0),0);
-
-  document.getElementById('stats-grid').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Total Cortes</div><div class="stat-value gold">${total}</div></div>
-    <div class="stat-card"><div class="stat-label">Pagos</div><div class="stat-value green">${paid}</div></div>
-    <div class="stat-card"><div class="stat-label">Pendentes</div><div class="stat-value red">${pending}</div></div>
-    <div class="stat-card"><div class="stat-label">Total Gasto</div><div class="stat-value">R$ ${totalR$.toFixed(2)}</div></div>
-    <div class="stat-card"><div class="stat-label">Já Pago</div><div class="stat-value green">R$ ${paidR$.toFixed(2)}</div></div>
-    <div class="stat-card"><div class="stat-label">A Pagar</div><div class="stat-value red">R$ ${pendingR$.toFixed(2)}</div></div>
-  `;
-}
-
-function renderPending() {
-  const pendingCuts = cuts.filter(c => c.status === 'pending');
-  const sec = document.getElementById('pending-section');
-  if (!pendingCuts.length) {
-    sec.innerHTML = `<div style="color:var(--muted);font-size:14px;margin-bottom:24px;padding:16px 0">✅ Nenhum corte pendente de pagamento!</div>`;
-    return;
-  }
-  const total = pendingCuts.reduce((s,c)=>s+parseFloat(c.price||0),0);
-  let rows = pendingCuts.map(c => `
-    <tr style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);align-items:center;flex-wrap:wrap;gap:6px">
-      <td style="font-size:13px;color:var(--muted)">${formatDate(c.date)}</td>
-      <td style="font-size:14px">${c.type}</td>
-      <td style="font-family:'DM Mono',monospace;color:var(--gold)">R$ ${parseFloat(c.price||0).toFixed(2)}</td>
-      <td><button class="action-btn" onclick="openPayModal('${c.id}')">💳 Pagar</button></td>
-    </tr>
-  `).join('');
-  sec.innerHTML = `
-    <div class="pending-block">
-      <div class="pending-block-header">
-        <span class="pending-block-title">🕒 ${pendingCuts.length} corte(s) aguardando pagamento</span>
-        <span class="pending-total">Total: R$ ${total.toFixed(2)}</span>
-      </div>
-      <table style="width:100%"><tbody>${rows}</tbody></table>
-      <div style="margin-top:16px">
-        <button class="btn-primary" onclick="payAll()">✓ Quitar Tudo (R$ ${total.toFixed(2)})</button>
-      </div>
-    </div>
-  `;
-}
-
-function renderTable() {
-  const q = (document.getElementById('search-input').value||'').toLowerCase();
-  let filtered = cuts.filter(c => {
-    if (activeFilter === 'pending' && c.status !== 'pending') return false;
-    if (activeFilter === 'paid'    && c.status !== 'paid')    return false;
-    if (q && !JSON.stringify(c).toLowerCase().includes(q))    return false;
-    return true;
-  }).slice().sort((a,b) => new Date(b.date) - new Date(a.date));
-
-  const tbody = document.getElementById('cuts-tbody');
-  const empty = document.getElementById('empty-state');
-
-  if (!filtered.length) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-  tbody.innerHTML = filtered.map(c => `
-    <tr>
-      <td style="font-family:'DM Mono',monospace;color:var(--muted);font-size:11px">${c.id.slice(-4).toUpperCase()}</td>
-      <td>${formatDate(c.date)}</td>
-      <td>${c.type}</td>
-      <td style="font-family:'DM Mono',monospace">R$ ${parseFloat(c.price||0).toFixed(2)}</td>
-      <td>${statusBadge(c.status)}</td>
-      <td style="font-size:12px;color:var(--muted)">${c.paydate ? formatDate(c.paydate) : '—'}</td>
-      <td style="font-size:12px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.invoice||''}">${c.invoice || '—'}</td>
-      <td>
-        ${c.status==='pending' ? `<button class="action-btn" onclick="openPayModal('${c.id}')">💳 Pagar</button>` : ''}
-        <button class="action-btn" onclick="editCut('${c.id}')">✏ Editar</button>
-        <button class="action-btn danger" onclick="deleteCut('${c.id}')">✕</button>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function statusBadge(s) {
-  if (s === 'paid') return `<span class="badge badge-paid">✓ Pago</span>`;
-  return `<span class="badge badge-pending">⏳ Pendente</span>`;
-}
-function formatDate(d) {
-  if (!d) return '—';
-  const [y,m,day] = d.split('-');
-  return `${day}/${m}/${y}`;
-}
-
-/* ══════════════════════════════════════════════
-   FILTER
-══════════════════════════════════════════════ */
-function setFilter(el, f) {
-  activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderTable();
-}
-
-/* ══════════════════════════════════════════════
-   ADD / EDIT CUT
-══════════════════════════════════════════════ */
-function openAddModal() {
-  document.getElementById('modal-title-text').textContent = 'Novo Corte';
-  document.getElementById('edit-id').value = '';
-  document.getElementById('f-type').value = '';
-  document.getElementById('f-price').value = '';
-  document.getElementById('f-notes').value = '';
-  document.getElementById('f-status').value = 'pending';
-  document.getElementById('f-paydate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('f-invoice').value = '';
-  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-  togglePayFields();
-  openModal('add-modal');
-}
-function editCut(id) {
-  const c = cuts.find(x=>x.id===id);
-  if (!c) return;
-  document.getElementById('modal-title-text').textContent = 'Editar Corte';
-  document.getElementById('edit-id').value  = id;
-  document.getElementById('f-date').value   = c.date;
-  document.getElementById('f-type').value   = c.type;
-  document.getElementById('f-price').value  = c.price;
-  document.getElementById('f-notes').value  = c.notes||'';
-  document.getElementById('f-status').value = c.status;
-  document.getElementById('f-paydate').value= c.paydate||'';
-  document.getElementById('f-invoice').value= c.invoice||'';
-  togglePayFields();
-  openModal('add-modal');
-}
-document.getElementById('f-status').addEventListener('change', togglePayFields);
-function togglePayFields() {
-  const s = document.getElementById('f-status').value;
-  document.getElementById('payment-fields').style.display = s === 'paid' ? 'block' : 'none';
-}
-function saveCut() {
-  const type  = document.getElementById('f-type').value;
-  const price = document.getElementById('f-price').value;
-  const date  = document.getElementById('f-date').value;
-  if (!type || !price || !date) { toast('⚠ Preencha data, tipo e preço.'); return; }
-  const id = document.getElementById('edit-id').value;
-  const obj = {
-    id:      id || genId(),
-    date, type,
-    price:   parseFloat(price),
-    notes:   document.getElementById('f-notes').value,
-    status:  document.getElementById('f-status').value,
-    paydate: document.getElementById('f-paydate').value || '',
-    invoice: document.getElementById('f-invoice').value || '',
-  };
-  if (id) {
-    const i = cuts.findIndex(x=>x.id===id);
-    cuts[i] = obj;
-    toast('✏ Corte atualizado!');
-  } else {
-    cuts.push(obj);
-    toast('✂ Corte adicionado!');
-  }
-  save(); closeModal('add-modal'); renderAll();
-}
-function deleteCut(id) {
-  if (!confirm('Remover este corte?')) return;
-  cuts = cuts.filter(x=>x.id!==id);
-  save(); renderAll(); toast('🗑 Corte removido.');
-}
-
-/* ══════════════════════════════════════════════
-   PAYMENT
-══════════════════════════════════════════════ */
-function openPayModal(id) {
-  document.getElementById('pay-id').value = id;
-  document.getElementById('p-paydate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('p-invoice').value = '';
-  openModal('pay-modal');
-}
-function confirmPayment() {
-  const id      = document.getElementById('pay-id').value;
-  const paydate = document.getElementById('p-paydate').value;
-  const invoice = document.getElementById('p-invoice').value;
-  if (!paydate) { toast('⚠ Informe a data do pagamento.'); return; }
-  const c = cuts.find(x=>x.id===id);
-  if (c) { c.status='paid'; c.paydate=paydate; c.invoice=invoice; }
-  save(); closeModal('pay-modal'); renderAll();
-  toast('✅ Pagamento confirmado!');
-}
-function payAll() {
-  const today   = new Date().toISOString().split('T')[0];
-  const invoice = prompt('Nota fiscal / comprovante (pode deixar em branco):', '');
-  cuts.filter(c=>c.status==='pending').forEach(c=>{
-    c.status='paid'; c.paydate=today; c.invoice=invoice||'';
-  });
-  save(); renderAll(); toast('✅ Todos os cortes quitados!');
-}
-
-/* ══════════════════════════════════════════════
-   SHEET SYNC
-══════════════════════════════════════════════ */
-function openSyncModal() {
-  const saved = localStorage.getItem(URL_KEY)||'';
-  document.getElementById('sheet-url').value = saved;
-  document.getElementById('saved-url').textContent = saved ? saved.slice(0,50)+'…' : 'nenhuma';
-  openModal('sync-modal');
-}
-async function loadFromSheet() {
-  const url = document.getElementById('sheet-url').value.trim();
-  if (!url) { toast('⚠ Cole a URL CSV da planilha.'); return; }
-  localStorage.setItem(URL_KEY, url);
-  toast('⏳ Importando da planilha…');
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Erro ao acessar planilha');
-    const text = await res.text();
-    const rows = text.trim().split('\n').slice(1); // skip header
-    const imported = [];
-    rows.forEach(row => {
-      // ID,Data,Tipo de Corte,Preço,Status,Data Pagamento,Nota Fiscal,Observações
-      const cols = row.split(',').map(c=>c.replace(/^"|"$/g,'').trim());
-      if (!cols[1]) return; // skip empty
-      imported.push({
-        id:      cols[0] || genId(),
-        date:    cols[1] || '',
-        type:    cols[2] || '',
-        price:   parseFloat(cols[3])||0,
-        status:  cols[4]==='Pago'?'paid':'pending',
-        paydate: cols[5]||'',
-        invoice: cols[6]||'',
-        notes:   cols[7]||'',
-      });
-    });
-    if (imported.length) {
-      cuts = imported;
-      save(); renderAll();
-      toast(`✅ ${imported.length} corte(s) importado(s)!`);
-    } else {
-      toast('⚠ Planilha vazia ou formato incorreto.');
+    switch (action) {
+      case "read":
+        result = readAll();
+        break;
+      case "add":
+        result = addRow(params);
+        break;
+      case "updatePayment":
+        result = updatePayment(params);
+        break;
+      case "updateInvoice":
+        result = updateInvoice(params);
+        break;
+      case "deleteRow":
+        result = deleteRow(params);
+        break;
+      default:
+        result = { success: false, error: "Ação inválida" };
     }
-  } catch(e) {
-    toast('❌ Erro ao importar. Verifique a URL e se a planilha está publicada como CSV.');
+  } catch (err) {
+    result = { success: false, error: err.toString() };
   }
-}
-function exportToCSV() {
-  const header = 'ID,Data,Tipo de Corte,Preço,Status,Data Pagamento,Nota Fiscal,Observações';
-  const rows = cuts.map(c => [
-    c.id, c.date, `"${c.type}"`, c.price,
-    c.status==='paid'?'Pago':'Pendente',
-    c.paydate||'', `"${c.invoice||''}"`, `"${c.notes||''}"`
-  ].join(','));
-  const csv = [header, ...rows].join('\n');
-  const blob = new Blob([csv], {type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'cortes_hugo.csv';
-  a.click();
-  toast('📥 CSV exportado! Importe no Google Sheets.');
+
+  return ContentService
+    .createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
-/* ══════════════════════════════════════════════
-   MODAL HELPERS
-══════════════════════════════════════════════ */
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => { if (e.target===el) closeModal(el.id); });
-});
+function readAll() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const rows = [];
 
-/* ══════════════════════════════════════════════
-   TOAST
-══════════════════════════════════════════════ */
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>el.classList.remove('show'), 2800);
+  for (let i = 1; i < data.length; i++) {
+    const row = {};
+    for (let j = 0; j < headers.length; j++) {
+      let val = data[i][j];
+      // Format dates
+      if (val instanceof Date) {
+        val = Utilities.formatDate(val, Session.getScriptTimeZone(), "dd/MM/yyyy");
+      }
+      row[headers[j]] = val;
+    }
+    rows.push(row);
+  }
+
+  return { success: true, data: rows };
 }
 
-/* ══════════════════════════════════════════════
-   AUTO-CHECK LOGIN (stay logged if session)
-══════════════════════════════════════════════ */
-// Keep session during tab lifetime via sessionStorage
-if (sessionStorage.getItem('hugos_auth') === '1') {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  init();
+function addRow(params) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+
+  // Generate next ID
+  let maxId = 0;
+  for (let i = 1; i < data.length; i++) {
+    const id = parseInt(data[i][0]);
+    if (!isNaN(id) && id > maxId) maxId = id;
+  }
+  const newId = maxId + 1;
+
+  const newRow = [
+    newId,
+    params.data || "",
+    params.tipoCorte || "",
+    params.preco ? parseFloat(params.preco.replace(",", ".")) : "",
+    params.status || "Pendente",
+    params.dataPagamento || "",
+    params.notaFiscal || "",
+    params.observacoes || ""
+  ];
+
+  sheet.appendRow(newRow);
+
+  return { success: true, message: "Corte adicionado!", id: newId };
 }
-const _doLogin = doLogin;
-window.doLogin = function() {
-  const v = document.getElementById('pwd-input').value;
-  if (v === PASSWORD) { sessionStorage.setItem('hugos_auth','1'); }
-  _doLogin();
-};
-const _doLogout = doLogout;
-window.doLogout = function() { sessionStorage.removeItem('hugos_auth'); _doLogout(); };
-</script>
-</body>
-</html>
+
+function updatePayment(params) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+  const targetId = parseInt(params.id);
+
+  for (let i = 1; i < data.length; i++) {
+    if (parseInt(data[i][0]) === targetId) {
+      sheet.getRange(i + 1, 5).setValue("Pago");  // Status
+      sheet.getRange(i + 1, 6).setValue(params.dataPagamento || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy")); // Data Pagamento
+      return { success: true, message: "Pagamento confirmado!" };
+    }
+  }
+
+  return { success: false, error: "ID não encontrado" };
+}
+
+function updateInvoice(params) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+  const targetId = parseInt(params.id);
+
+  for (let i = 1; i < data.length; i++) {
+    if (parseInt(data[i][0]) === targetId) {
+      sheet.getRange(i + 1, 7).setValue(params.notaFiscal || ""); // Nota Fiscal
+      return { success: true, message: "Nota fiscal atualizada!" };
+    }
+  }
+
+  return { success: false, error: "ID não encontrado" };
+}
+
+function deleteRow(params) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+  const targetId = parseInt(params.id);
+
+  for (let i = 1; i < data.length; i++) {
+    if (parseInt(data[i][0]) === targetId) {
+      sheet.deleteRow(i + 1);
+      return { success: true, message: "Registro deletado!" };
+    }
+  }
+
+  return { success: false, error: "ID não encontrado" };
+}
