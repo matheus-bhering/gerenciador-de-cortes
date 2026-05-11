@@ -1,1250 +1,1238 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>BarberCtrl — Hugo & Matheus</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<style>
-/* ========== RESET & BASE ========== */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0f0f14;
-  --bg2:#16161d;
-  --bg3:#1e1e28;
-  --bg4:#282835;
-  --gold:#c8a45e;
-  --gold-dim:#9a7d3f;
-  --gold-glow:rgba(200,164,94,.15);
-  --green:#3ecf8e;
-  --green-dim:rgba(62,207,142,.12);
-  --red:#ef6b6b;
-  --red-dim:rgba(239,107,107,.12);
-  --blue:#6ba3ef;
-  --blue-dim:rgba(107,163,239,.12);
-  --text:#e8e4dd;
-  --text2:#9e99a7;
-  --text3:#5f5b69;
-  --radius:14px;
-  --radius-sm:10px;
-  --shadow:0 4px 24px rgba(0,0,0,.35);
-}
-html{font-size:16px;-webkit-tap-highlight-color:transparent}
-body{
-  font-family:'DM Sans',system-ui,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100dvh;
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
-input,button,select,textarea{font-family:inherit;font-size:inherit;border:none;outline:none;background:none;color:inherit}
-button{cursor:pointer}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>CONTROLE DE CORTE v3.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root{
+      --bg:#0f0f14;
+      --bg2:#16161d;
+      --bg3:#1e1e28;
+      --bg4:#282835;
+      --gold:#c8a45e;
+      --gold-dim:#9a7d3f;
+      --gold-glow:rgba(200,164,94,.15);
+      --green:#3ecf8e;
+      --green-dim:rgba(62,207,142,.12);
+      --red:#f06b6b;
+      --red-dim:rgba(240,107,107,.12);
+      --blue:#6ba3ef;
+      --blue-dim:rgba(107,163,239,.12);
+      --text:#e8e4dd;
+      --text2:#9e9a97;
+      --text3:#5f5b69;
+      --radius:14px;
+      --radius-sm:10px;
+      --shadow:0 4px 24px rgba(0,0,0,.35);
+    }
+    html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
+    body{
+      font-family:'DM Sans',system-ui,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100dvh;
+      overflow-x:hidden;
+      -webkit-font-smoothing:antialiased;
+    }
+    input,button,select,textarea{font-family:inherit;font-size:inherit;border:none;outline:none;background:none;color:inherit}
+    button{cursor:pointer}
 
-/* ========== SCREENS ========== */
-.screen{display:none;min-height:100dvh;padding-bottom:100px;animation:fadeUp .35s ease}
-.screen.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .screen{display:none;min-height:100dvh;padding-bottom:100px;animation:fadeUp .35s ease}
+    .screen.active{display:block}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-/* ========== LOGIN ========== */
-#loginScreen{
-  display:none;
-  min-height:100dvh;
-  justify-content:center;
-  align-items:center;
-  padding:24px;
-  background:radial-gradient(ellipse at 50% 30%,#1a1a26,var(--bg));
-}
-#loginScreen.active{display:flex}
+    /* LOGIN */
+    #loginScreen{
+      min-height:100dvh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:24px;
+      background:radial-gradient(ellipse at 50% 30%, #1a1a26, var(--bg));
+    }
+    .login-box{width:100%;max-width:360px;text-align:center}
+    .login-logo{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:3rem;
+      letter-spacing:3px;
+      color:var(--gold);
+      margin-bottom:4px;
+      line-height:1;
+    }
+    .login-logo span{color:var(--text)}
+    .login-version{
+      color:var(--text2);
+      font-size:.8rem;
+      margin-bottom:8px;
+      letter-spacing:.6px;
+    }
+    .login-sub{
+      color:var(--text2);
+      font-size:.85rem;
+      margin-bottom:28px;
+      letter-spacing:.5px;
+    }
+    .login-credit{
+      color:var(--text3);
+      font-size:.72rem;
+      margin-top:10px;
+    }
+    .login-input-wrap{position:relative;margin-bottom:20px}
+    .login-input-wrap input{
+      width:100%;
+      padding:16px 20px;
+      background:var(--bg3);
+      border:1.5px solid var(--bg4);
+      border-radius:var(--radius);
+      font-size:1rem;
+      color:var(--text);
+      transition:border-color .2s;
+    }
+    .login-input-wrap input:focus{border-color:var(--gold)}
+    .login-input-wrap input::placeholder{color:var(--text3)}
+    .login-btn{
+      width:100%;
+      padding:16px;
+      background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+      color:var(--bg);
+      font-weight:700;
+      font-size:1rem;
+      border-radius:var(--radius);
+      letter-spacing:.5px;
+      transition:transform .15s,box-shadow .15s;
+      box-shadow:0 8px 24px rgba(200,164,94,.16);
+    }
+    .login-btn:active{transform:scale(.97)}
+    .login-error{color:var(--red);font-size:.85rem;margin-top:14px;min-height:20px}
 
-.login-box{
-  width:100%;
-  max-width:360px;
-  text-align:center;
-}
-.login-logo{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:3rem;
-  letter-spacing:3px;
-  color:var(--gold);
-  margin-bottom:4px;
-}
-.login-logo span{color:var(--text)}
-.login-sub{color:var(--text2);font-size:.85rem;margin-bottom:40px;letter-spacing:.5px}
+    /* HEADER */
+    .app-header{
+      position:sticky;top:0;z-index:100;
+      background:rgba(15,15,20,.85);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      padding:16px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid rgba(200,164,94,.08);
+    }
+    .header-brand{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:1.5rem;
+      letter-spacing:2px;
+      color:var(--gold);
+    }
+    .header-brand span{color:var(--text);font-size:1.1rem}
+    .header-actions{display:flex;gap:10px;align-items:center}
+    .header-btn{
+      width:38px;height:38px;
+      display:flex;align-items:center;justify-content:center;
+      background:var(--bg3);
+      border-radius:10px;
+      transition:background .15s;
+    }
+    .header-btn:active{background:var(--bg4)}
+    .header-btn svg{width:20px;height:20px;color:var(--text2)}
 
-.login-input-wrap{
-  position:relative;
-  margin-bottom:20px;
-}
-.login-input-wrap input{
-  width:100%;
-  padding:16px 20px;
-  background:var(--bg3);
-  border:1.5px solid var(--bg4);
-  border-radius:var(--radius);
-  font-size:1rem;
-  color:var(--text);
-  transition:border-color .2s;
-}
-.login-input-wrap input:focus{border-color:var(--gold)}
-.login-input-wrap input::placeholder{color:var(--text3)}
+    /* MONTH NAV */
+    .month-nav{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      padding:12px 20px;
+    }
+    .month-nav-btn{
+      width:36px;height:36px;
+      display:flex;align-items:center;justify-content:center;
+      background:var(--bg3);
+      border-radius:10px;
+    }
+    .month-nav-btn svg{width:18px;height:18px;color:var(--text2)}
+    .month-nav-label{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:1.2rem;
+      letter-spacing:1px;
+      min-width:160px;
+      text-align:center;
+    }
 
-.login-btn{
-  width:100%;
-  padding:16px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
-  color:var(--bg);
-  font-weight:700;
-  font-size:1rem;
-  border-radius:var(--radius);
-  letter-spacing:.5px;
-  transition:transform .15s,box-shadow .15s;
-}
-.login-btn:active{transform:scale(.97)}
+    /* STATS */
+    .stats-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      padding:20px;
+    }
+    .stat-card{
+      background:var(--bg2);
+      border:1px solid rgba(255,255,255,.04);
+      border-radius:var(--radius);
+      padding:16px;
+    }
+    .stat-label{
+      font-size:.75rem;
+      color:var(--text2);
+      text-transform:uppercase;
+      letter-spacing:1px;
+      margin-bottom:8px;
+    }
+    .stat-value{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:2rem;
+      letter-spacing:1px;
+      line-height:1;
+    }
+    .stat-value.gold{color:var(--gold)}
+    .stat-value.green{color:var(--green)}
+    .stat-value.red{color:var(--red)}
+    .stat-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      font-size:.7rem;
+      font-weight:600;
+      padding:3px 8px;
+      border-radius:20px;
+      margin-top:6px;
+    }
+    .stat-badge.pending{background:var(--red-dim);color:var(--red)}
+    .stat-badge.paid{background:var(--green-dim);color:var(--green)}
 
-.login-error{
-  color:var(--red);
-  font-size:.85rem;
-  margin-top:14px;
-  min-height:20px;
-}
+    /* MENUS */
+    .menu-block{padding:0 20px 16px}
+    .menu-title{
+      font-size:.9rem;
+      color:var(--text2);
+      text-transform:uppercase;
+      letter-spacing:1px;
+      margin:6px 0 10px;
+    }
+    .menu-card{
+      background:var(--bg2);
+      border:1px solid rgba(255,255,255,.04);
+      border-radius:var(--radius);
+      padding:14px;
+      margin-bottom:10px;
+    }
+    .menu-card-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+    .menu-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{
+      padding:9px 12px;
+      border-radius:999px;
+      background:var(--bg3);
+      color:var(--text2);
+      font-size:.78rem;
+      font-weight:700;
+    }
+    .chip.active{background:var(--gold-glow);color:var(--gold)}
+    .chip.green{background:var(--green-dim);color:var(--green)}
+    .chip.blue{background:var(--blue-dim);color:var(--blue)}
+    .chip.red{background:var(--red-dim);color:var(--red)}
 
-/* ========== HEADER ========== */
-.app-header{
-  position:sticky;
-  top:0;
-  z-index:100;
-  background:rgba(15,15,20,.85);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  padding:16px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid rgba(200,164,94,.08);
-}
-.header-brand{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:1.5rem;
-  letter-spacing:2px;
-  color:var(--gold);
-}
-.header-brand span{color:var(--text);font-size:1.1rem}
-.header-actions{display:flex;gap:10px;align-items:center}
-.header-btn{
-  width:38px;height:38px;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--bg3);
-  border-radius:10px;
-  transition:background .15s;
-}
-.header-btn:active{background:var(--bg4)}
-.header-btn svg{width:20px;height:20px;color:var(--text2)}
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:8px 20px 12px;
+    }
+    .section-title{font-weight:700;font-size:1rem}
+    .section-filter{display:flex;gap:6px;flex-wrap:wrap}
 
-/* ========== STATS CARDS ========== */
-.stats-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  padding:20px;
-}
-.stat-card{
-  background:var(--bg2);
-  border:1px solid rgba(255,255,255,.04);
-  border-radius:var(--radius);
-  padding:16px;
-}
-.stat-card.wide{grid-column:1/-1}
-.stat-label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-.stat-value{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:1px}
-.stat-value.gold{color:var(--gold)}
-.stat-value.green{color:var(--green)}
-.stat-value.red{color:var(--red)}
-.stat-badge{
-  display:inline-flex;
-  align-items:center;
-  gap:4px;
-  font-size:.7rem;
-  font-weight:600;
-  padding:3px 8px;
-  border-radius:20px;
-  margin-top:6px;
-}
-.stat-badge.pending{background:var(--red-dim);color:var(--red)}
-.stat-badge.paid{background:var(--green-dim);color:var(--green)}
+    /* CUT LIST */
+    .cuts-list{
+      padding:0 20px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .cut-card{
+      background:var(--bg2);
+      border:1px solid rgba(255,255,255,.04);
+      border-radius:var(--radius);
+      padding:16px;
+      transition:transform .12s;
+      position:relative;
+      overflow:hidden;
+    }
+    .cut-card:active{transform:scale(.985)}
+    .cut-card::before{
+      content:"";
+      position:absolute;left:0;top:0;bottom:0;width:3px;
+    }
+    .cut-card.pending::before{background:var(--red)}
+    .cut-card.paid::before{background:var(--green)}
+    .cut-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:10px;
+      gap:10px;
+    }
+    .cut-type{font-weight:700;font-size:.95rem}
+    .cut-date{font-size:.78rem;color:var(--text2)}
+    .cut-status{
+      font-size:.7rem;
+      font-weight:700;
+      padding:4px 10px;
+      border-radius:20px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      white-space:nowrap;
+    }
+    .cut-status.pending{background:var(--red-dim);color:var(--red)}
+    .cut-status.paid{background:var(--green-dim);color:var(--green)}
+    .cut-bottom{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+    .cut-price{
+      font-family:'JetBrains Mono',monospace;
+      font-size:1.1rem;
+      font-weight:500;
+      color:var(--gold);
+    }
+    .cut-obs{
+      font-size:.75rem;
+      color:var(--text3);
+      margin-top:6px;
+      font-style:italic;
+    }
+    .cut-actions{display:flex;gap:8px}
+    .cut-action-btn{
+      width:34px;height:34px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:8px;
+      transition:all .15s;
+    }
+    .cut-action-btn.pay{background:var(--green-dim);color:var(--green)}
+    .cut-action-btn.invoice{background:var(--blue-dim);color:var(--blue)}
+    .cut-action-btn:active{transform:scale(.9)}
+    .cut-action-btn svg{width:16px;height:16px}
+    .cut-invoice-tag{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      font-size:.7rem;
+      color:var(--blue);
+      background:var(--blue-dim);
+      padding:3px 8px;
+      border-radius:6px;
+      margin-top:8px;
+    }
 
-/* ========== SECTION HEADERS ========== */
-.section-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:8px 20px 12px;
-}
-.section-title{font-weight:700;font-size:1rem}
-.section-filter{
-  display:flex;
-  gap:6px;
-}
-.filter-chip{
-  padding:6px 14px;
-  font-size:.78rem;
-  font-weight:600;
-  border-radius:20px;
-  background:var(--bg3);
-  color:var(--text2);
-  transition:all .15s;
-}
-.filter-chip.active{background:var(--gold-glow);color:var(--gold)}
+    .empty-state{
+      text-align:center;
+      padding:60px 20px;
+      color:var(--text3);
+    }
+    .empty-state svg{width:48px;height:48px;margin-bottom:12px;opacity:.3}
+    .empty-state p{font-size:.9rem}
 
-/* ========== CUT CARDS ========== */
-.cuts-list{padding:0 20px;display:flex;flex-direction:column;gap:10px}
-.cut-card{
-  background:var(--bg2);
-  border:1px solid rgba(255,255,255,.04);
-  border-radius:var(--radius);
-  padding:16px;
-  transition:transform .12s;
-  position:relative;
-  overflow:hidden;
-}
-.cut-card:active{transform:scale(.985)}
-.cut-card::before{
-  content:'';
-  position:absolute;
-  left:0;top:0;bottom:0;
-  width:3px;
-}
-.cut-card.pending::before{background:var(--red)}
-.cut-card.paid::before{background:var(--green)}
+    /* FAB */
+    .fab{
+      position:fixed;
+      bottom:28px;
+      right:20px;
+      width:58px;height:58px;
+      background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+      color:var(--bg);
+      border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 28px rgba(200,164,94,.35);
+      transition:transform .15s;
+      z-index:90;
+    }
+    .fab:active{transform:scale(.9)}
+    .fab svg{width:26px;height:26px}
 
-.cut-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.cut-type{font-weight:700;font-size:.95rem}
-.cut-date{font-size:.78rem;color:var(--text2)}
-.cut-status{
-  font-size:.7rem;
-  font-weight:700;
-  padding:4px 10px;
-  border-radius:20px;
-  text-transform:uppercase;
-  letter-spacing:.5px;
-}
-.cut-status.pending{background:var(--red-dim);color:var(--red)}
-.cut-status.paid{background:var(--green-dim);color:var(--green)}
+    /* MODAL */
+    .modal-overlay{
+      display:none;
+      position:fixed;
+      inset:0;
+      z-index:200;
+      background:rgba(0,0,0,.6);
+      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);
+      justify-content:center;
+      align-items:flex-end;
+      animation:fadeIn .2s;
+    }
+    .modal-overlay.open{display:flex}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .modal-sheet{
+      width:100%;
+      max-width:480px;
+      max-height:90dvh;
+      overflow-y:auto;
+      background:var(--bg2);
+      border-radius:20px 20px 0 0;
+      padding:20px 20px 36px;
+      animation:slideUp .3s ease;
+    }
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .modal-handle{width:36px;height:4px;background:var(--bg4);border-radius:4px;margin:0 auto 20px}
+    .modal-title{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:1.5rem;
+      letter-spacing:1px;
+      color:var(--gold);
+      margin-bottom:20px;
+    }
+    .form-group{margin-bottom:16px}
+    .form-label{
+      display:block;
+      font-size:.78rem;
+      font-weight:600;
+      color:var(--text2);
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      margin-bottom:6px;
+    }
+    .form-input{
+      width:100%;
+      padding:14px 16px;
+      background:var(--bg);
+      border:1.5px solid var(--bg4);
+      border-radius:var(--radius-sm);
+      font-size:.95rem;
+      color:var(--text);
+    }
+    .form-input:focus{border-color:var(--gold)}
+    .form-input::placeholder{color:var(--text3)}
+    select.form-input{
+      appearance:none;
+      -webkit-appearance:none;
+    }
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-submit{
+      width:100%;
+      padding:16px;
+      margin-top:8px;
+      background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+      color:var(--bg);
+      font-weight:700;
+      font-size:1rem;
+      border-radius:var(--radius);
+      letter-spacing:.5px;
+    }
+    .form-submit:active{transform:scale(.97)}
+    .form-submit:disabled{opacity:.5}
+    .form-cancel{
+      width:100%;
+      padding:14px;
+      margin-top:8px;
+      background:var(--bg4);
+      color:var(--text2);
+      font-weight:600;
+      font-size:.9rem;
+      border-radius:var(--radius-sm);
+    }
 
-.cut-bottom{display:flex;justify-content:space-between;align-items:center}
-.cut-price{
-  font-family:'JetBrains Mono',monospace;
-  font-size:1.1rem;
-  font-weight:500;
-  color:var(--gold);
-}
-.cut-obs{font-size:.75rem;color:var(--text3);margin-top:6px;font-style:italic}
-.cut-actions{display:flex;gap:8px}
-.cut-action-btn{
-  width:34px;height:34px;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:8px;
-  transition:all .15s;
-}
-.cut-action-btn.pay{background:var(--green-dim);color:var(--green)}
-.cut-action-btn.invoice{background:var(--blue-dim);color:var(--blue)}
-.cut-action-btn.pay:active,.cut-action-btn.invoice:active{transform:scale(.9)}
-.cut-action-btn svg{width:16px;height:16px}
+    .toast{
+      position:fixed;
+      top:20px;
+      left:50%;
+      transform:translateX(-50%) translateY(-120px);
+      z-index:999;
+      background:var(--bg3);
+      color:var(--text);
+      padding:14px 24px;
+      border-radius:var(--radius);
+      font-weight:600;
+      font-size:.88rem;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.06);
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+      white-space:nowrap;
+    }
+    .toast.show{transform:translateX(-50%) translateY(0)}
+    .toast.success{border-left:3px solid var(--green)}
+    .toast.error{border-left:3px solid var(--red)}
 
-.cut-invoice-tag{
-  display:inline-flex;
-  align-items:center;
-  gap:4px;
-  font-size:.7rem;
-  color:var(--blue);
-  background:var(--blue-dim);
-  padding:3px 8px;
-  border-radius:6px;
-  margin-top:8px;
-}
+    .loader{display:flex;justify-content:center;padding:40px}
+    .loader-dots{display:flex;gap:6px}
+    .loader-dots span{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--gold);
+      animation:bounce .6s infinite alternate;
+    }
+    .loader-dots span:nth-child(2){animation-delay:.15s}
+    .loader-dots span:nth-child(3){animation-delay:.3s}
+    @keyframes bounce{to{opacity:.2;transform:translateY(-6px)}}
 
-.empty-state{
-  text-align:center;
-  padding:60px 20px;
-  color:var(--text3);
-}
-.empty-state svg{width:48px;height:48px;margin-bottom:12px;opacity:.3}
-.empty-state p{font-size:.9rem}
+    .confirm-overlay{
+      display:none;
+      position:fixed;
+      inset:0;
+      z-index:300;
+      background:rgba(0,0,0,.7);
+      justify-content:center;
+      align-items:center;
+      padding:24px;
+    }
+    .confirm-overlay.open{display:flex}
+    .confirm-box{
+      background:var(--bg2);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius);
+      padding:28px 24px;
+      width:100%;
+      max-width:340px;
+      text-align:center;
+      animation:fadeUp .25s ease;
+    }
+    .confirm-icon{margin-bottom:16px}
+    .confirm-title{font-weight:700;font-size:1.05rem;margin-bottom:8px}
+    .confirm-text{font-size:.85rem;color:var(--text2);margin-bottom:24px;line-height:1.5}
+    .confirm-actions{display:flex;gap:10px}
+    .confirm-actions button{flex:1;padding:12px;border-radius:var(--radius-sm);font-weight:600;font-size:.9rem}
+    .confirm-no{background:var(--bg4);color:var(--text2)}
+    .confirm-yes{background:var(--green);color:#fff}
+    .confirm-yes.danger{background:var(--red)}
 
-/* ========== FAB ========== */
-.fab{
-  position:fixed;
-  bottom:28px;
-  right:20px;
-  width:58px;height:58px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
-  color:var(--bg);
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 6px 28px rgba(200,164,94,.35);
-  transition:transform .15s;
-  z-index:90;
-}
-.fab:active{transform:scale(.9)}
-.fab svg{width:26px;height:26px}
+    .detail-field{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .detail-label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .detail-value{font-size:1rem;font-weight:500}
+    .detail-actions{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+    .detail-btn{
+      padding:14px;
+      border-radius:var(--radius-sm);
+      font-weight:600;
+      font-size:.9rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .detail-btn.pay{background:var(--green-dim);color:var(--green)}
+    .detail-btn.invoice{background:var(--blue-dim);color:var(--blue)}
+    .detail-btn.delete{background:var(--red-dim);color:var(--red)}
+    .detail-btn svg{width:18px;height:18px}
 
-/* ========== MODAL ========== */
-.modal-overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:200;
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-  justify-content:center;
-  align-items:flex-end;
-  animation:fadeIn .2s;
-}
-.modal-overlay.open{display:flex}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .whatsapp-fab{
+      position:fixed;
+      left:20px;
+      bottom:28px;
+      width:58px;height:58px;
+      background:#25D366;
+      color:#fff;
+      border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 28px rgba(37,211,102,.28);
+      z-index:90;
+    }
+    .whatsapp-fab svg{width:26px;height:26px}
+    .share-btn{
+      width:100%;
+      padding:14px;
+      border-radius:var(--radius-sm);
+      background:var(--blue-dim);
+      color:var(--blue);
+      font-weight:700;
+      margin-top:10px;
+    }
 
-.modal-sheet{
-  width:100%;
-  max-width:480px;
-  max-height:90dvh;
-  overflow-y:auto;
-  background:var(--bg2);
-  border-radius:20px 20px 0 0;
-  padding:20px 20px 36px;
-  animation:slideUp .3s ease;
-}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-
-.modal-handle{
-  width:36px;height:4px;
-  background:var(--bg4);
-  border-radius:4px;
-  margin:0 auto 20px;
-}
-.modal-title{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:1.5rem;
-  letter-spacing:1px;
-  color:var(--gold);
-  margin-bottom:20px;
-}
-
-.form-group{margin-bottom:16px}
-.form-label{
-  display:block;
-  font-size:.78rem;
-  font-weight:600;
-  color:var(--text2);
-  text-transform:uppercase;
-  letter-spacing:.5px;
-  margin-bottom:6px;
-}
-.form-input{
-  width:100%;
-  padding:14px 16px;
-  background:var(--bg);
-  border:1.5px solid var(--bg4);
-  border-radius:var(--radius-sm);
-  font-size:.95rem;
-  color:var(--text);
-  transition:border-color .2s;
-}
-.form-input:focus{border-color:var(--gold)}
-.form-input::placeholder{color:var(--text3)}
-select.form-input{-webkit-appearance:none;appearance:none}
-
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-.form-submit{
-  width:100%;
-  padding:16px;
-  margin-top:8px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
-  color:var(--bg);
-  font-weight:700;
-  font-size:1rem;
-  border-radius:var(--radius);
-  letter-spacing:.5px;
-  transition:transform .15s;
-}
-.form-submit:active{transform:scale(.97)}
-.form-submit:disabled{opacity:.5}
-
-.form-cancel{
-  width:100%;
-  padding:14px;
-  margin-top:8px;
-  background:var(--bg4);
-  color:var(--text2);
-  font-weight:600;
-  font-size:.9rem;
-  border-radius:var(--radius);
-}
-
-/* ========== TOAST ========== */
-.toast{
-  position:fixed;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%) translateY(-120px);
-  z-index:999;
-  background:var(--bg3);
-  color:var(--text);
-  padding:14px 24px;
-  border-radius:var(--radius);
-  font-weight:600;
-  font-size:.88rem;
-  box-shadow:var(--shadow);
-  border:1px solid rgba(255,255,255,.06);
-  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
-  white-space:nowrap;
-}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.toast.success{border-left:3px solid var(--green)}
-.toast.error{border-left:3px solid var(--red)}
-
-/* ========== LOADING ========== */
-.loader{
-  display:flex;
-  justify-content:center;
-  padding:40px;
-}
-.loader-dots{display:flex;gap:6px}
-.loader-dots span{
-  width:8px;height:8px;
-  border-radius:50%;
-  background:var(--gold);
-  animation:bounce .6s infinite alternate;
-}
-.loader-dots span:nth-child(2){animation-delay:.15s}
-.loader-dots span:nth-child(3){animation-delay:.3s}
-@keyframes bounce{to{opacity:.2;transform:translateY(-6px)}}
-
-/* ========== MONTH NAV ========== */
-.month-nav{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:16px;
-  padding:12px 20px;
-}
-.month-nav-btn{
-  width:36px;height:36px;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--bg3);
-  border-radius:10px;
-}
-.month-nav-btn svg{width:18px;height:18px;color:var(--text2)}
-.month-nav-label{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:1.2rem;
-  letter-spacing:1px;
-  min-width:160px;
-  text-align:center;
-}
-
-/* ========== CONFIRM DIALOG ========== */
-.confirm-overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:300;
-  background:rgba(0,0,0,.7);
-  justify-content:center;
-  align-items:center;
-  padding:24px;
-}
-.confirm-overlay.open{display:flex}
-.confirm-box{
-  background:var(--bg2);
-  border:1px solid rgba(255,255,255,.06);
-  border-radius:var(--radius);
-  padding:28px 24px;
-  width:100%;
-  max-width:340px;
-  text-align:center;
-  animation:fadeUp .25s ease;
-}
-.confirm-icon{margin-bottom:16px}
-.confirm-title{font-weight:700;font-size:1.05rem;margin-bottom:8px}
-.confirm-text{font-size:.85rem;color:var(--text2);margin-bottom:24px;line-height:1.5}
-.confirm-actions{display:flex;gap:10px}
-.confirm-actions button{flex:1;padding:12px;border-radius:var(--radius-sm);font-weight:600;font-size:.9rem}
-.confirm-no{background:var(--bg4);color:var(--text2)}
-.confirm-yes{background:var(--green);color:#fff}
-.confirm-yes.danger{background:var(--red)}
-
-/* ========== DETAIL VIEW ========== */
-.detail-field{
-  padding:14px 0;
-  border-bottom:1px solid rgba(255,255,255,.04);
-}
-.detail-label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.detail-value{font-size:1rem;font-weight:500}
-.detail-actions{display:flex;flex-direction:column;gap:10px;margin-top:20px}
-.detail-btn{
-  padding:14px;
-  border-radius:var(--radius-sm);
-  font-weight:600;
-  font-size:.9rem;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-}
-.detail-btn.pay{background:var(--green-dim);color:var(--green)}
-.detail-btn.invoice{background:var(--blue-dim);color:var(--blue)}
-.detail-btn.delete{background:var(--red-dim);color:var(--red)}
-.detail-btn svg{width:18px;height:18px}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
-</style>
+    @media (min-width: 768px){
+      .stats-row{grid-template-columns:repeat(4,1fr)}
+      .menu-card-row{align-items:center}
+      .modal-sheet{border-radius:20px; margin-bottom:20px}
+    }
+  </style>
 </head>
 <body>
+  <div id="toast" class="toast"></div>
 
-<!-- ======================== TOAST ======================== -->
-<div id="toast" class="toast"></div>
-
-<!-- ======================== LOGIN ======================== -->
-<div id="loginScreen" class="screen active">
-  <div class="login-box">
-    <div style="margin-bottom:32px">
-      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" style="margin-bottom:8px">
-        <path d="M5.5 20.5L3.5 22.5M18.5 20.5L20.5 22.5M7 12C7 12 7.5 14 12 14C16.5 14 17 12 17 12M8 2L8 6M16 2L16 6M12 2L12 4"/>
-        <rect x="4" y="6" width="16" height="14" rx="3"/>
-      </svg>
-      <div class="login-logo">BARBER<span>CTRL</span></div>
-      <div class="login-sub">Hugo & Matheus</div>
+  <div id="loginScreen" class="screen active">
+    <div class="login-box">
+      <div class="login-logo">CONTROLE <span>DE CORTE</span></div>
+      <div class="login-version">v3.0</div>
+      <div class="login-sub">Acesso restrito</div>
+      <div class="login-input-wrap">
+        <input type="password" id="loginPass" placeholder="Digite a senha de acesso" autocomplete="off" />
+      </div>
+      <button class="login-btn" onclick="tryLogin()">ENTRAR</button>
+      <div class="login-error" id="loginError"></div>
+      <div class="login-credit">By Matheus Bhering</div>
     </div>
-    <div class="login-input-wrap">
-      <input type="password" id="loginPass" placeholder="Digite a senha de acesso" autocomplete="off">
-    </div>
-    <button class="login-btn" onclick="tryLogin()">ENTRAR</button>
-    <div class="login-error" id="loginError"></div>
   </div>
-</div>
 
-<!-- ======================== DASHBOARD ======================== -->
-<div id="dashScreen" class="screen">
-  <!-- Header -->
-  <div class="app-header">
-    <div class="header-brand">BARBER<span>CTRL</span></div>
-    <div class="header-actions">
-      <button class="header-btn" onclick="loadData()" title="Recarregar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+  <div id="dashScreen" class="screen">
+    <header class="app-header">
+      <div class="header-brand">CONTROLE <span>DE CORTE</span></div>
+      <div class="header-actions">
+        <button class="header-btn" onclick="shareMonthSummary()" title="Compartilhar resumo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/></svg>
+        </button>
+        <button class="header-btn" onclick="loadData()" title="Recarregar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        </button>
+        <button class="header-btn" onclick="logout()" title="Sair">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="changeMonth(-1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <button class="header-btn" onclick="logout()" title="Sair">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      <div class="month-nav-label" id="monthLabel"></div>
+      <button class="month-nav-btn" onclick="changeMonth(1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>
-  </div>
 
-  <!-- Month Nav -->
-  <div class="month-nav">
-    <button class="month-nav-btn" onclick="changeMonth(-1)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
-    <div class="month-nav-label" id="monthLabel"></div>
-    <button class="month-nav-btn" onclick="changeMonth(1)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-row" id="statsRow">
-    <div class="stat-card">
-      <div class="stat-label">Cortes no mês</div>
-      <div class="stat-value gold" id="statTotal">—</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Total gasto</div>
-      <div class="stat-value" id="statGasto">—</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Pagos</div>
-      <div class="stat-value green" id="statPagos">—</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Pendentes</div>
-      <div class="stat-value red" id="statPend">—</div>
-      <div class="stat-badge pending" id="statPendVal" style="display:none">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
-        <span id="statPendText"></span>
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-label">Cortes no mês</div>
+        <div class="stat-value gold" id="statTotal"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total gasto</div>
+        <div class="stat-value" id="statGasto"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pagos</div>
+        <div class="stat-value green" id="statPagos"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pendentes</div>
+        <div class="stat-value red" id="statPend"></div>
+        <div class="stat-badge pending" id="statPendVal" style="display:none"><span>•</span> <span id="statPendText"></span></div>
       </div>
     </div>
-  </div>
 
-  <!-- Filters + List -->
-  <div class="section-head">
-    <div class="section-title">Histórico</div>
-    <div class="section-filter">
-      <button class="filter-chip active" data-filter="all" onclick="setFilter('all',this)">Todos</button>
-      <button class="filter-chip" data-filter="pending" onclick="setFilter('pending',this)">Pendente</button>
-      <button class="filter-chip" data-filter="paid" onclick="setFilter('paid',this)">Pago</button>
-    </div>
-  </div>
-
-  <div id="cutsList" class="cuts-list"></div>
-
-  <!-- FAB -->
-  <button class="fab" onclick="openAddModal()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-  </button>
-</div>
-
-<!-- ======================== ADD MODAL ======================== -->
-<div class="modal-overlay" id="addModal">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">✂️ Novo Corte</div>
-
-    <!-- Password gate -->
-    <div id="addPassGate">
-      <div class="form-group">
-        <label class="form-label">Senha de registro</label>
-        <input type="password" class="form-input" id="addPass" placeholder="Senha para adicionar corte">
-      </div>
-      <button class="form-submit" onclick="checkAddPass()">Confirmar</button>
-      <button class="form-cancel" onclick="closeModal('addModal')">Cancelar</button>
-    </div>
-
-    <!-- Form -->
-    <div id="addForm" style="display:none">
-      <div class="form-group">
-        <label class="form-label">Tipo de corte</label>
-        <input type="text" class="form-input" id="fTipo" placeholder="Ex: Degradê, Social, Barba...">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Preço (R$)</label>
-          <input type="text" inputmode="decimal" class="form-input" id="fPreco" placeholder="0,00">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Data</label>
-          <input type="date" class="form-input" id="fData">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Observações</label>
-        <input type="text" class="form-input" id="fObs" placeholder="Opcional">
-      </div>
-      <button class="form-submit" id="addSubmitBtn" onclick="submitCut()">Adicionar Corte</button>
-      <button class="form-cancel" onclick="closeModal('addModal')">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ======================== DETAIL MODAL ======================== -->
-<div class="modal-overlay" id="detailModal">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="detailTitle">Detalhes do Corte</div>
-    <div id="detailContent"></div>
-  </div>
-</div>
-
-<!-- ======================== PAYMENT MODAL ======================== -->
-<div class="modal-overlay" id="payModal">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">💰 Confirmar Pagamento</div>
-    <div id="payContent"></div>
-  </div>
-</div>
-
-<!-- ======================== INVOICE MODAL ======================== -->
-<div class="modal-overlay" id="invoiceModal">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">📄 Nota Fiscal</div>
-    <div id="invoiceContent"></div>
-  </div>
-</div>
-
-<!-- ======================== CONFIRM DIALOG ======================== -->
-<div class="confirm-overlay" id="confirmDialog">
-  <div class="confirm-box">
-    <div class="confirm-icon" id="confirmIcon"></div>
-    <div class="confirm-title" id="confirmTitle"></div>
-    <div class="confirm-text" id="confirmText"></div>
-    <div class="confirm-actions">
-      <button class="confirm-no" onclick="closeConfirm()">Cancelar</button>
-      <button class="confirm-yes" id="confirmYes">Confirmar</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ============================================================
-// CONFIG — Cole aqui a URL do seu Google Apps Script
-// ============================================================
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhx1ngfOs8eopPRpedYHFE7A8EO4t4nn7rCfBiOdXFxrZz80WY3qH2mf3XSBrR1a_t/exec";
-
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo-CLB0__unjyN2Wq6t9r9vq5Fknj3vxXbws-ErK0suF3QtMbRlRgK02McDW2gBIwJlRqpPnxA9QV4/pub?output=csv";
-
-const LOGIN_PASS = "Matheus123";
-const ADD_PASS = "Matheus-123$";
-
-// ============================================================
-// STATE
-// ============================================================
-let allCuts = [];
-let currentFilter = "all";
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
-let addPassVerified = false;
-
-const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-
-// ============================================================
-// LOGIN
-// ============================================================
-document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin() });
-
-function tryLogin() {
-  const pass = document.getElementById('loginPass').value;
-  if (pass === LOGIN_PASS) {
-    document.getElementById('loginScreen').classList.remove('active');
-    document.getElementById('dashScreen').classList.add('active');
-    sessionStorage.setItem('bc_auth','1');
-    loadData();
-  } else {
-    document.getElementById('loginError').textContent = 'Senha incorreta';
-    document.getElementById('loginPass').value = '';
-  }
-}
-
-function logout() {
-  sessionStorage.removeItem('bc_auth');
-  document.getElementById('dashScreen').classList.remove('active');
-  document.getElementById('loginScreen').classList.add('active');
-  document.getElementById('loginPass').value = '';
-  document.getElementById('loginError').textContent = '';
-}
-
-// Auto-login if session
-if (sessionStorage.getItem('bc_auth') === '1') {
-  document.getElementById('loginScreen').classList.remove('active');
-  document.getElementById('dashScreen').classList.add('active');
-  setTimeout(loadData, 100);
-}
-
-// ============================================================
-// DATA LOADING
-// ============================================================
-async function loadData() {
-  const list = document.getElementById('cutsList');
-  list.innerHTML = '<div class="loader"><div class="loader-dots"><span></span><span></span><span></span></div></div>';
-
-  try {
-    // Try Apps Script first, fallback to CSV
-    let data;
-    if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "COLE_SUA_URL_AQUI") {
-      data = await loadFromAppsScript();
-    } else {
-      data = await loadFromCSV();
-    }
-    allCuts = data;
-    updateMonthLabel();
-    renderStats();
-    renderList();
-  } catch(err) {
-    console.error(err);
-    list.innerHTML = '<div class="empty-state"><p>Erro ao carregar dados. Verifique a conexão.</p></div>';
-  }
-}
-
-async function loadFromAppsScript() {
-  const res = await fetch(`${APPS_SCRIPT_URL}?action=read`);
-  const json = await res.json();
-  if (json.success) return json.data.map(normalizeRow);
-  throw new Error(json.error);
-}
-
-async function loadFromCSV() {
-  const res = await fetch(CSV_URL);
-  const text = await res.text();
-  const lines = text.split('\n').filter(l => l.trim());
-  if (lines.length < 2) return [];
-  
-  const headers = parseCSVLine(lines[0]);
-  return lines.slice(1).map(line => {
-    const vals = parseCSVLine(line);
-    const row = {};
-    headers.forEach((h, i) => row[h.trim()] = (vals[i] || '').trim());
-    return normalizeRow(row);
-  });
-}
-
-function parseCSVLine(line) {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') { inQuotes = !inQuotes; }
-    else if (ch === ',' && !inQuotes) { result.push(current); current = ''; }
-    else { current += ch; }
-  }
-  result.push(current);
-  return result;
-}
-
-function normalizeRow(row) {
-  return {
-    id: row['Id'] || row['id'] || '',
-    data: row['Data'] || row['data'] || '',
-    tipoCorte: row['Tipo de Corte'] || row['tipo de corte'] || row['Tipo De Corte'] || '',
-    preco: row['Preço'] || row['Preco'] || row['preco'] || row['preço'] || '',
-    status: row['Status'] || row['status'] || '',
-    dataPagamento: row['Data Pagamento'] || row['data pagamento'] || '',
-    notaFiscal: row['Nota Fiscal'] || row['nota fiscal'] || '',
-    observacoes: row['Observações'] || row['Observacoes'] || row['observações'] || row['observacoes'] || ''
-  };
-}
-
-// ============================================================
-// MONTH NAV
-// ============================================================
-function updateMonthLabel() {
-  document.getElementById('monthLabel').textContent = `${MONTHS[currentMonth]} ${currentYear}`;
-}
-
-function changeMonth(dir) {
-  currentMonth += dir;
-  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-  updateMonthLabel();
-  renderStats();
-  renderList();
-}
-
-function getMonthCuts() {
-  return allCuts.filter(c => {
-    const d = parseDate(c.data);
-    return d && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-  });
-}
-
-function parseDate(str) {
-  if (!str) return null;
-  str = String(str).trim();
-  // dd/MM/yyyy
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
-    const [d, m, y] = str.split('/');
-    return new Date(y, m - 1, d);
-  }
-  // yyyy-MM-dd
-  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
-    const [y, m, d] = str.split(/[-T]/);
-    return new Date(y, m - 1, d);
-  }
-  // Try native
-  const d = new Date(str);
-  return isNaN(d.getTime()) ? null : d;
-}
-
-function formatDate(str) {
-  const d = parseDate(str);
-  if (!d) return str;
-  return d.toLocaleDateString('pt-BR');
-}
-
-function formatPrice(val) {
-  if (!val && val !== 0) return 'R$ —';
-  const n = typeof val === 'string' ? parseFloat(val.replace(',', '.').replace(/[^\d.]/g, '')) : val;
-  if (isNaN(n)) return 'R$ —';
-  return 'R$ ' + n.toFixed(2).replace('.', ',');
-}
-
-// ============================================================
-// STATS
-// ============================================================
-function renderStats() {
-  const cuts = getMonthCuts();
-  const total = cuts.length;
-  const paid = cuts.filter(c => isPaid(c));
-  const pending = cuts.filter(c => !isPaid(c));
-  const totalVal = cuts.reduce((s, c) => s + parsePrice(c.preco), 0);
-  const pendVal = pending.reduce((s, c) => s + parsePrice(c.preco), 0);
-
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statGasto').textContent = formatPrice(totalVal);
-  document.getElementById('statPagos').textContent = paid.length;
-  document.getElementById('statPend').textContent = pending.length;
-
-  const badge = document.getElementById('statPendVal');
-  if (pendVal > 0) {
-    badge.style.display = 'inline-flex';
-    document.getElementById('statPendText').textContent = formatPrice(pendVal);
-  } else {
-    badge.style.display = 'none';
-  }
-}
-
-function isPaid(c) {
-  const s = (c.status || '').toLowerCase().trim();
-  return s === 'pago' || s === 'paid';
-}
-
-function parsePrice(val) {
-  if (!val && val !== 0) return 0;
-  const n = typeof val === 'string' ? parseFloat(val.replace(',', '.').replace(/[^\d.]/g, '')) : val;
-  return isNaN(n) ? 0 : n;
-}
-
-// ============================================================
-// FILTER & RENDER LIST
-// ============================================================
-function setFilter(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active');
-  renderList();
-}
-
-function renderList() {
-  const list = document.getElementById('cutsList');
-  let cuts = getMonthCuts();
-
-  if (currentFilter === 'pending') cuts = cuts.filter(c => !isPaid(c));
-  if (currentFilter === 'paid') cuts = cuts.filter(c => isPaid(c));
-
-  // Sort by date desc
-  cuts.sort((a, b) => {
-    const da = parseDate(a.data) || new Date(0);
-    const db = parseDate(b.data) || new Date(0);
-    return db - da;
-  });
-
-  if (cuts.length === 0) {
-    list.innerHTML = `
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 20.5L3.5 22.5M18.5 20.5L20.5 22.5M7 12C7 12 7.5 14 12 14C16.5 14 17 12 17 12M8 2L8 6M16 2L16 6M12 2L12 4"/><rect x="4" y="6" width="16" height="14" rx="3"/></svg>
-        <p>Nenhum corte ${currentFilter==='pending'?'pendente':currentFilter==='paid'?'pago':''} neste mês</p>
-      </div>`;
-    return;
-  }
-
-  list.innerHTML = cuts.map(c => {
-    const paid = isPaid(c);
-    const statusClass = paid ? 'paid' : 'pending';
-    const statusLabel = paid ? 'Pago' : 'Pendente';
-    const nf = c.notaFiscal ? `<div class="cut-invoice-tag">📄 NF: ${esc(c.notaFiscal)}</div>` : '';
-    const obs = c.observacoes ? `<div class="cut-obs">${esc(c.observacoes)}</div>` : '';
-    
-    return `
-      <div class="cut-card ${statusClass}" onclick="openDetail(${esc(c.id)})">
-        <div class="cut-top">
+    <div class="menu-block">
+      <div class="menu-title">💰 Pendentes de pagamento</div>
+      <div class="menu-card">
+        <div class="menu-card-row">
           <div>
-            <div class="cut-type">${esc(c.tipoCorte) || '—'}</div>
-            <div class="cut-date">${formatDate(c.data)}</div>
+            <div style="font-weight:700">Resumo rápido</div>
+            <div style="color:var(--text2);font-size:.82rem" id="pendingQuickText">Carregando...</div>
           </div>
-          <span class="cut-status ${statusClass}">${statusLabel}</span>
-        </div>
-        <div class="cut-bottom">
-          <div class="cut-price">${formatPrice(c.preco)}</div>
-          <div class="cut-actions">
-            ${!paid ? `<button class="cut-action-btn pay" onclick="event.stopPropagation();openPayModal(${esc(c.id)})" title="Pagar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></button>` : ''}
-            <button class="cut-action-btn invoice" onclick="event.stopPropagation();openInvoiceModal(${esc(c.id)})" title="Nota Fiscal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></button>
+          <div class="menu-actions">
+            <span class="chip red" id="pendingQuickBadge">0 pendentes</span>
           </div>
         </div>
-        ${nf}${obs}
-      </div>`;
-  }).join('');
-}
-
-function esc(str) {
-  if (str === null || str === undefined) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-// ============================================================
-// ADD CUT
-// ============================================================
-function openAddModal() {
-  addPassVerified = false;
-  document.getElementById('addPassGate').style.display = 'block';
-  document.getElementById('addForm').style.display = 'none';
-  document.getElementById('addPass').value = '';
-  document.getElementById('fData').value = new Date().toISOString().split('T')[0];
-  document.getElementById('fTipo').value = '';
-  document.getElementById('fPreco').value = '';
-  document.getElementById('fObs').value = '';
-  openModal('addModal');
-}
-
-function checkAddPass() {
-  if (document.getElementById('addPass').value === ADD_PASS) {
-    addPassVerified = true;
-    document.getElementById('addPassGate').style.display = 'none';
-    document.getElementById('addForm').style.display = 'block';
-  } else {
-    showToast('Senha incorreta', 'error');
-  }
-}
-
-async function submitCut() {
-  if (!addPassVerified) return;
-  
-  const tipo = document.getElementById('fTipo').value.trim();
-  const preco = document.getElementById('fPreco').value.trim();
-  const data = document.getElementById('fData').value;
-
-  if (!tipo || !preco || !data) {
-    showToast('Preencha todos os campos obrigatórios', 'error');
-    return;
-  }
-
-  // Format date to dd/MM/yyyy
-  const [y, m, d] = data.split('-');
-  const dataFormatted = `${d}/${m}/${y}`;
-
-  const btn = document.getElementById('addSubmitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Adicionando...';
-
-  try {
-    if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "COLE_SUA_URL_AQUI") {
-      const url = `${APPS_SCRIPT_URL}?action=add&data=${enc(dataFormatted)}&tipoCorte=${enc(tipo)}&preco=${enc(preco)}&status=Pendente&observacoes=${enc(document.getElementById('fObs').value.trim())}`;
-      const res = await fetch(url);
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error);
-    } else {
-      showToast('Configure o Apps Script para salvar dados', 'error');
-      btn.disabled = false;
-      btn.textContent = 'Adicionar Corte';
-      return;
-    }
-
-    showToast('Corte adicionado com sucesso! ✂️', 'success');
-    closeModal('addModal');
-    await loadData();
-  } catch(err) {
-    console.error(err);
-    showToast('Erro ao adicionar. Tente novamente.', 'error');
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'Adicionar Corte';
-}
-
-// ============================================================
-// DETAIL VIEW
-// ============================================================
-function openDetail(id) {
-  const cut = allCuts.find(c => String(c.id) === String(id));
-  if (!cut) return;
-  const paid = isPaid(cut);
-
-  const content = document.getElementById('detailContent');
-  document.getElementById('detailTitle').textContent = `✂️ Corte #${cut.id}`;
-
-  content.innerHTML = `
-    <div class="detail-field">
-      <div class="detail-label">Tipo de Corte</div>
-      <div class="detail-value">${esc(cut.tipoCorte) || '—'}</div>
+      </div>
     </div>
-    <div class="detail-field">
-      <div class="detail-label">Data</div>
-      <div class="detail-value">${formatDate(cut.data)}</div>
+
+    <div class="menu-block">
+      <div class="menu-title">📋 Histórico de Cortes</div>
+      <div class="menu-card">
+        <div class="menu-actions">
+          <button class="chip active" data-filter="all" onclick="setFilter('all', this)">TODOS</button>
+          <button class="chip" data-filter="pending" onclick="setFilter('pending', this)">PENDENTES</button>
+          <button class="chip" data-filter="paid" onclick="setFilter('paid', this)">PAGOS</button>
+        </div>
+      </div>
     </div>
-    <div class="detail-field">
-      <div class="detail-label">Preço</div>
-      <div class="detail-value" style="color:var(--gold)">${formatPrice(cut.preco)}</div>
+
+    <div class="section-head">
+      <div class="section-title">Cortes lançados</div>
+      <div class="section-filter">
+        <button class="chip green" onclick="openWhatsApp()">WhatsApp Hugo</button>
+      </div>
     </div>
-    <div class="detail-field">
-      <div class="detail-label">Status</div>
-      <div class="detail-value"><span class="cut-status ${paid?'paid':'pending'}">${paid?'Pago':'Pendente'}</span></div>
+
+    <div id="cutsList" class="cuts-list"></div>
+
+    <button class="fab" onclick="openAddModal()" title="Adicionar corte">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+    </button>
+
+    <button class="whatsapp-fab" onclick="openWhatsApp()" title="Falar com Hugo no WhatsApp">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.8 11.8 0 0 0 12.08 0C5.5 0 .16 5.31.16 11.84c0 2.08.55 4.1 1.59 5.87L0 24l6.45-1.68a11.8 11.8 0 0 0 5.63 1.43h.01c6.58 0 11.92-5.31 11.92-11.84 0-3.17-1.24-6.14-3.49-8.43ZM12.09 21.7h-.01a9.8 9.8 0 0 1-4.99-1.37l-.36-.21-3.83 1 1.02-3.72-.24-.38a9.77 9.77 0 0 1-1.52-5.18C2.16 6.35 6.4 2.2 12.08 2.2c2.62 0 5.09 1.02 6.94 2.87a9.72 9.72 0 0 1 2.88 6.91c0 5.38-4.41 9.72-9.81 9.72Zm5.68-7.31c-.31-.16-1.85-.91-2.14-1.02-.29-.11-.5-.16-.71.16-.21.31-.81 1.02-.99 1.23-.18.21-.37.24-.68.08-.31-.16-1.3-.48-2.47-1.54-.91-.81-1.52-1.81-1.7-2.12-.18-.31-.02-.48.14-.64.14-.14.31-.37.47-.55.16-.18.21-.31.31-.52.11-.21.05-.39-.02-.55-.08-.16-.71-1.7-.97-2.33-.26-.63-.52-.55-.71-.56h-.6c-.21 0-.55.08-.84.39-.29.31-1.1 1.08-1.1 2.62s1.13 3.03 1.29 3.24c.16.21 2.2 3.36 5.34 4.71.75.32 1.33.51 1.78.65.75.24 1.43.21 1.97.13.6-.09 1.85-.76 2.11-1.5.26-.74.26-1.37.18-1.5-.08-.13-.29-.21-.6-.37Z"/></svg>
+    </button>
+  </div>
+
+  <!-- MODAL: ADD -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Novo Corte</div>
+
+      <div id="addPassGate">
+        <div class="form-group">
+          <label class="form-label">Senha de registro</label>
+          <input type="password" class="form-input" id="addPass" placeholder="Senha para adicionar corte" />
+        </div>
+        <button class="form-submit" onclick="checkAddPass()">Confirmar</button>
+        <button class="form-cancel" onclick="closeModal('addModal')">Cancelar</button>
+      </div>
+
+      <div id="addForm" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Tipo de corte</label>
+          <select class="form-input" id="fTipo">
+            <option value="">Selecione...</option>
+            <option>Nevou+corte R$ 130.00</option>
+            <option>Luzes+corte R$ 130.00</option>
+            <option>Barba R$ 15.00</option>
+            <option>Sobrancelha R$ 7.00</option>
+            <option>Pezinho R$ 7.00</option>
+            <option>Corte disfarçado R$ 30.00</option>
+            <option>Corte simples+barba R$ 40.00</option>
+            <option>Corte disfarçado+barba R$ 45.00</option>
+            <option>Corte simples+barba+sobrancelha R$ 47.00</option>
+            <option>Corte disfaçado+barba+sobrancelha R$ 52.00</option>
+            <option>Corte+pigmentação R$ 45.00</option>
+            <option>Corte navalhado R$ 35.00</option>
+            <option>Corte+pigmentação+barba +sobrancelha R$ 67.00</option>
+            <option>Corte+pigmentação+sobrancelha R$ 52.00</option>
+            <option>Corte disfarçado+sobrancelha R$ 37.00</option>
+            <option>Corte navalhado+barba R$ 50.00</option>
+            <option>Corte disfarçado +barba +pigmentação R$ 60.00</option>
+            <option>Corte Degrade R$ 30.00</option>
+            <option>Corte degrade +barba R$ 45.00</option>
+            <option>Corte degrade+barba+sobrancelha R$ 52.00</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Preço R$</label>
+            <input type="text" inputmode="decimal" class="form-input" id="fPreco" placeholder="0,00" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input type="date" class="form-input" id="fData" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observações</label>
+          <input type="text" class="form-input" id="fObs" placeholder="Opcional" />
+        </div>
+        <button class="form-submit" id="addSubmitBtn" onclick="submitCut()">Adicionar Corte</button>
+        <button class="form-cancel" onclick="closeModal('addModal')">Cancelar</button>
+      </div>
     </div>
-    ${cut.dataPagamento ? `<div class="detail-field"><div class="detail-label">Data Pagamento</div><div class="detail-value">${formatDate(cut.dataPagamento)}</div></div>` : ''}
-    ${cut.notaFiscal ? `<div class="detail-field"><div class="detail-label">Nota Fiscal</div><div class="detail-value" style="color:var(--blue)">${esc(cut.notaFiscal)}</div></div>` : ''}
-    ${cut.observacoes ? `<div class="detail-field"><div class="detail-label">Observações</div><div class="detail-value" style="color:var(--text2)">${esc(cut.observacoes)}</div></div>` : ''}
-    <div class="detail-actions">
-      ${!paid ? `<button class="detail-btn pay" onclick="closeModal('detailModal');openPayModal(${cut.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Confirmar Pagamento</button>` : ''}
-      <button class="detail-btn invoice" onclick="closeModal('detailModal');openInvoiceModal(${cut.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>${cut.notaFiscal ? 'Editar' : 'Adicionar'} Nota Fiscal</button>
-      <button class="detail-btn delete" onclick="closeModal('detailModal');confirmDelete(${cut.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Excluir Corte</button>
+  </div>
+
+  <!-- MODAL: DETAIL -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="detailTitle">Detalhes do Corte</div>
+      <div id="detailContent"></div>
+      <button class="form-cancel" style="margin-top:10px" onclick="closeModal('detailModal')">Fechar</button>
     </div>
-    <button class="form-cancel" style="margin-top:10px" onclick="closeModal('detailModal')">Fechar</button>
-  `;
-  openModal('detailModal');
-}
+  </div>
 
-// ============================================================
-// PAYMENT
-// ============================================================
-function openPayModal(id) {
-  const cut = allCuts.find(c => String(c.id) === String(id));
-  if (!cut) return;
-
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('payContent').innerHTML = `
-    <p style="color:var(--text2);margin-bottom:20px;font-size:.9rem">
-      Confirmar pagamento do corte <strong style="color:var(--text)">${esc(cut.tipoCorte)}</strong> — <strong style="color:var(--gold)">${formatPrice(cut.preco)}</strong>
-    </p>
-    <div class="form-group">
-      <label class="form-label">Data do pagamento</label>
-      <input type="date" class="form-input" id="payDate" value="${today}">
+  <!-- MODAL: PAYMENT -->
+  <div class="modal-overlay" id="payModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Confirmar Pagamento</div>
+      <div id="payContent"></div>
     </div>
-    <button class="form-submit" onclick="confirmPay(${cut.id})">✅ Confirmar Pagamento</button>
-    <button class="form-cancel" onclick="closeModal('payModal')">Cancelar</button>
-  `;
-  openModal('payModal');
-}
+  </div>
 
-async function confirmPay(id) {
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "COLE_SUA_URL_AQUI") {
-    showToast('Configure o Apps Script primeiro', 'error');
-    return;
-  }
-
-  const payDate = document.getElementById('payDate').value;
-  const [y, m, d] = payDate.split('-');
-  const formatted = `${d}/${m}/${y}`;
-
-  try {
-    const url = `${APPS_SCRIPT_URL}?action=updatePayment&id=${id}&dataPagamento=${enc(formatted)}`;
-    const res = await fetch(url);
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error);
-    
-    showToast('Pagamento confirmado! ✅', 'success');
-    closeModal('payModal');
-    await loadData();
-  } catch(err) {
-    console.error(err);
-    showToast('Erro ao confirmar pagamento', 'error');
-  }
-}
-
-// ============================================================
-// INVOICE
-// ============================================================
-function openInvoiceModal(id) {
-  const cut = allCuts.find(c => String(c.id) === String(id));
-  if (!cut) return;
-
-  document.getElementById('invoiceContent').innerHTML = `
-    <p style="color:var(--text2);margin-bottom:20px;font-size:.9rem">
-      Nota fiscal do corte <strong style="color:var(--text)">${esc(cut.tipoCorte)}</strong> em <strong style="color:var(--text)">${formatDate(cut.data)}</strong>
-    </p>
-    <div class="form-group">
-      <label class="form-label">Número / Código da Nota Fiscal</label>
-      <input type="text" class="form-input" id="nfInput" value="${esc(cut.notaFiscal)}" placeholder="Ex: NF-001234">
+  <!-- MODAL: INVOICE -->
+  <div class="modal-overlay" id="invoiceModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Nota Fiscal / PIX</div>
+      <div id="invoiceContent"></div>
     </div>
-    <button class="form-submit" onclick="saveInvoice(${cut.id})">💾 Salvar Nota Fiscal</button>
-    <button class="form-cancel" onclick="closeModal('invoiceModal')">Cancelar</button>
-  `;
-  openModal('invoiceModal');
-}
+  </div>
 
-async function saveInvoice(id) {
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "COLE_SUA_URL_AQUI") {
-    showToast('Configure o Apps Script primeiro', 'error');
-    return;
-  }
+  <div class="confirm-overlay" id="confirmDialog">
+    <div class="confirm-box">
+      <div class="confirm-icon" id="confirmIcon"></div>
+      <div class="confirm-title" id="confirmTitle"></div>
+      <div class="confirm-text" id="confirmText"></div>
+      <div class="confirm-actions">
+        <button class="confirm-no" onclick="closeConfirm()">Cancelar</button>
+        <button class="confirm-yes" id="confirmYes">Confirmar</button>
+      </div>
+    </div>
+  </div>
 
-  const nf = document.getElementById('nfInput').value.trim();
+  <script>
+    const APPSSCRIPTURL = 'https://script.google.com/macros/s/AKfycbzhx1ngfOs8eopPRpedYHFE7A8EO4t4nn7rCfBiOdXFxrZz80WY3qH2mf3XSBrR1ate/exec';
+    const CSVURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRo-CLB0unjyN2Wq6t9r9vq5Fknj3vxXbws-ErK0suF3QtMbRlRgK02McDW2gBIwJlRqpPnxA9QV4pu/pub?output=csv';
+    const LOGINPASS = 'Matheus123';
+    const ADDPASS = 'Matheus-123$';
+    const HUGO_WA = '5531971325441';
 
-  try {
-    const url = `${APPS_SCRIPT_URL}?action=updateInvoice&id=${id}&notaFiscal=${enc(nf)}`;
-    const res = await fetch(url);
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error);
+    let allCuts = [];
+    let currentFilter = 'all';
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+    let addPassVerified = false;
+    let currentCutId = null;
+    const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
-    showToast('Nota fiscal salva! 📄', 'success');
-    closeModal('invoiceModal');
-    await loadData();
-  } catch(err) {
-    console.error(err);
-    showToast('Erro ao salvar nota fiscal', 'error');
-  }
-}
+    document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
 
-// ============================================================
-// DELETE
-// ============================================================
-function confirmDelete(id) {
-  showConfirm(
-    '🗑️',
-    'Excluir corte?',
-    'Essa ação não pode ser desfeita. O registro será removido da planilha.',
-    'danger',
-    async () => {
-      try {
-        const url = `${APPS_SCRIPT_URL}?action=deleteRow&id=${id}`;
-        const res = await fetch(url);
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error);
-        showToast('Corte excluído', 'success');
-        await loadData();
-      } catch(err) {
-        showToast('Erro ao excluir', 'error');
+    function tryLogin(){
+      const pass = document.getElementById('loginPass').value;
+      if(pass === LOGINPASS){
+        document.getElementById('loginScreen').classList.remove('active');
+        document.getElementById('dashScreen').classList.add('active');
+        loadData();
+      } else {
+        document.getElementById('loginError').textContent = 'Senha incorreta';
+        document.getElementById('loginPass').value = '';
       }
     }
-  );
-}
 
-// ============================================================
-// MODAL UTILS
-// ============================================================
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
+    function logout(){
+      document.getElementById('dashScreen').classList.remove('active');
+      document.getElementById('loginScreen').classList.add('active');
+      document.getElementById('loginPass').value = '';
+      document.getElementById('loginError').textContent = '';
+    }
 
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-  document.body.style.overflow = '';
-}
+    function openWhatsApp(){
+      const msg = encodeURIComponent('Olá Hugo, estou entrando em contato pelo Controle de Corte.');
+      window.open(`https://wa.me/${HUGO_WA}?text=${msg}`, '_blank', 'noopener,noreferrer');
+    }
 
-// Close modals on overlay click
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => {
-    if (e.target === el) closeModal(el.id);
-  });
-});
+    function shareMonthSummary(){
+      const cuts = getMonthCuts();
+      const total = cuts.length;
+      const paid = cuts.filter(isPaid).length;
+      const pending = cuts.filter(c => !isPaid(c)).length;
+      const totalVal = cuts.reduce((s,c)=>s+parsePrice(c.preco),0);
+      const text = `Resumo do mês - ${MONTHS[currentMonth]}/${currentYear}%0A` +
+                   `Total de cortes: ${total}%0A` +
+                   `Pagos: ${paid}%0A` +
+                   `Pendentes: ${pending}%0A` +
+                   `Total: ${formatPrice(totalVal)}%0A%0A` +
+                   `Atualizado no Controle de Corte.`;
+      window.open(`https://wa.me/${HUGO_WA}?text=${text}`, '_blank', 'noopener,noreferrer');
+    }
 
-// ============================================================
-// CONFIRM DIALOG
-// ============================================================
-let confirmCb = null;
-function showConfirm(icon, title, text, type, callback) {
-  document.getElementById('confirmIcon').innerHTML = `<span style="font-size:2rem">${icon}</span>`;
-  document.getElementById('confirmTitle').textContent = title;
-  document.getElementById('confirmText').textContent = text;
-  const btn = document.getElementById('confirmYes');
-  btn.className = 'confirm-yes' + (type === 'danger' ? ' danger' : '');
-  confirmCb = callback;
-  btn.onclick = () => { closeConfirm(); if(confirmCb) confirmCb(); };
-  document.getElementById('confirmDialog').classList.add('open');
-}
+    async function loadData(){
+      const list = document.getElementById('cutsList');
+      list.innerHTML = '<div class="loader"><div class="loader-dots"><span></span><span></span><span></span></div></div>';
+      try{
+        let data = [];
+        try{
+          data = await loadFromAppsScript();
+        }catch(e){
+          data = await loadFromCSV();
+        }
+        allCuts = data || [];
+        updateMonthLabel();
+        renderStats();
+        renderQuickMenu();
+        renderList();
+      }catch(err){
+        console.error(err);
+        list.innerHTML = '<div class="empty-state"><p>Erro ao carregar dados.</p></div>';
+      }
+    }
 
-function closeConfirm() {
-  document.getElementById('confirmDialog').classList.remove('open');
-  confirmCb = null;
-}
+    async function loadFromAppsScript(){
+      const res = await fetch(`${APPSSCRIPTURL}?action=read`);
+      const json = await res.json();
+      if(json.success) return json.data.map(normalizeRow);
+      throw new Error(json.error);
+    }
 
-// ============================================================
-// TOAST
-// ============================================================
-function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + type + ' show';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
-}
+    async function loadFromCSV(){
+      const res = await fetch(CSVURL);
+      const text = await res.text();
+      const lines = text.split('\\n').filter(l => l.trim());
+      if(lines.length < 2) return [];
+      const headers = parseCSVLine(lines[0]);
+      return lines.slice(1).map(line => {
+        const vals = parseCSVLine(line);
+        const row = {};
+        headers.forEach((h,i)=>row[h.trim()] = (vals[i] || '').trim());
+        return normalizeRow(row);
+      });
+    }
 
-// ============================================================
-// UTILS
-// ============================================================
-function enc(str) { return encodeURIComponent(str); }
-</script>
+    function parseCSVLine(line){
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for(let i=0;i<line.length;i++){
+        const ch = line[i];
+        if(ch === '"') inQuotes = !inQuotes;
+        else if(ch === ',' && !inQuotes){ result.push(current); current=''; }
+        else current += ch;
+      }
+      result.push(current);
+      return result;
+    }
+
+    function normalizeRow(row){
+      return {
+        id: row.Id || row.id || '',
+        data: row.Data || row.data || '',
+        tipoCorte: row['Tipo de Corte'] || row.tipoCorte || row['Tipo De Corte'] || '',
+        preco: row.Preço || row.Preco || row.preco || '',
+        status: row.Status || row.status || '',
+        dataPagamento: row['Data Pagamento'] || row.dataPagamento || '',
+        notaFiscal: row['Nota Fiscal'] || row.notaFiscal || '',
+        comprovantePix: row['Comprovante PIX'] || row.comprovantePix || '',
+        observacoes: row.Observações || row.Observacoes || row.observacoes || ''
+      };
+    }
+
+    function updateMonthLabel(){
+      document.getElementById('monthLabel').textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+    }
+
+    function changeMonth(dir){
+      currentMonth += dir;
+      if(currentMonth > 11){ currentMonth = 0; currentYear++; }
+      if(currentMonth < 0){ currentMonth = 11; currentYear--; }
+      updateMonthLabel();
+      renderStats();
+      renderQuickMenu();
+      renderList();
+    }
+
+    function parseDate(str){
+      if(!str) return null;
+      str = String(str).trim();
+      if(/^\d{2}\/\d{2}\/\d{4}$/.test(str)){
+        const [d,m,y] = str.split('/');
+        return new Date(y, m-1, d);
+      }
+      if(/^\d{4}-\d{2}-\d{2}$/.test(str)){
+        return new Date(str + 'T00:00:00');
+      }
+      const d = new Date(str);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function formatDate(str){
+      const d = parseDate(str);
+      return d ? d.toLocaleDateString('pt-BR') : str;
+    }
+
+    function parsePrice(val){
+      if(!val && val !== 0) return 0;
+      const n = typeof val === 'string' ? parseFloat(val.replace(',', '.').replace(/[^\d.-]/g,'')) : val;
+      return isNaN(n) ? 0 : n;
+    }
+
+    function formatPrice(val){
+      const n = parsePrice(val);
+      return 'R$ ' + n.toFixed(2).replace('.', ',');
+    }
+
+    function isPaid(c){
+      const s = String(c.status || '').toLowerCase().trim();
+      return s === 'pago' || s === 'paid' || s === 'já pago' || s === 'ja pago';
+    }
+
+    function getMonthCuts(){
+      return allCuts.filter(c => {
+        const d = parseDate(c.data);
+        return d && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      });
+    }
+
+    function renderStats(){
+      const cuts = getMonthCuts();
+      const total = cuts.length;
+      const paid = cuts.filter(isPaid);
+      const pending = cuts.filter(c => !isPaid(c));
+      const totalVal = cuts.reduce((s,c)=>s+parsePrice(c.preco),0);
+      const pendVal = pending.reduce((s,c)=>s+parsePrice(c.preco),0);
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statGasto').textContent = formatPrice(totalVal);
+      document.getElementById('statPagos').textContent = paid.length;
+      document.getElementById('statPend').textContent = pending.length;
+      const badge = document.getElementById('statPendVal');
+      if(pendVal > 0){
+        badge.style.display = 'inline-flex';
+        document.getElementById('statPendText').textContent = formatPrice(pendVal);
+      }else{
+        badge.style.display = 'none';
+      }
+    }
+
+    function renderQuickMenu(){
+      const cuts = getMonthCuts();
+      const pending = cuts.filter(c => !isPaid(c));
+      const totalPend = pending.reduce((s,c)=>s+parsePrice(c.preco),0);
+      document.getElementById('pendingQuickText').textContent = pending.length
+        ? `${pending.length} cortes aguardando pagamento • ${formatPrice(totalPend)}`
+        : 'Nenhum pagamento pendente neste mês.';
+      document.getElementById('pendingQuickBadge').textContent = `${pending.length} pendentes`;
+    }
+
+    function setFilter(f, btn){
+      currentFilter = f;
+      document.querySelectorAll('[data-filter]').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderList();
+    }
+
+    function renderList(){
+      const list = document.getElementById('cutsList');
+      let cuts = getMonthCuts();
+      if(currentFilter === 'pending') cuts = cuts.filter(c => !isPaid(c));
+      if(currentFilter === 'paid') cuts = cuts.filter(c => isPaid(c));
+      cuts.sort((a,b)=>{
+        const da = parseDate(a.data) || new Date(0);
+        const db = parseDate(b.data) || new Date(0);
+        return db - da;
+      });
+      if(!cuts.length){
+        list.innerHTML = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 20.5L3.5 22.5M18.5 20.5L20.5 22.5M7 12C7 12 7.5 14 12 14C16.5 14 17 12 17 12M8 2L8 6M16 2L16 6M12 2L12 4"/><rect x="4" y="6" width="16" height="14" rx="3"/></svg>
+          <p>Nenhum corte ${currentFilter === 'pending' ? 'pendente' : currentFilter === 'paid' ? 'pago' : ''} neste mês.</p>
+        </div>`;
+        return;
+      }
+      list.innerHTML = cuts.map(c => {
+        const paid = isPaid(c);
+        const statusClass = paid ? 'paid' : 'pending';
+        const statusLabel = paid ? 'Pago' : 'Pendente';
+        const nf = c.notaFiscal ? `<div class="cut-invoice-tag">NF: ${esc(c.notaFiscal)}</div>` : '';
+        const obs = c.observacoes ? `<div class="cut-obs">${esc(c.observacoes)}</div>` : '';
+        const pix = c.comprovantePix ? `<div class="cut-invoice-tag">PIX: disponível</div>` : '';
+        return `
+          <div class="cut-card ${statusClass}" onclick="openDetail('${esc(c.id)}')">
+            <div class="cut-top">
+              <div>
+                <div class="cut-type">${esc(c.tipoCorte)}</div>
+                <div class="cut-date">${formatDate(c.data)}</div>
+              </div>
+              <span class="cut-status ${statusClass}">${statusLabel}</span>
+            </div>
+            <div class="cut-bottom">
+              <div class="cut-price">${formatPrice(c.preco)}</div>
+              <div class="cut-actions">
+                ${!paid ? `<button class="cut-action-btn pay" onclick="event.stopPropagation(); openPayModal('${esc(c.id)}')" title="Pagar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></button>` : ''}
+                <button class="cut-action-btn invoice" onclick="event.stopPropagation(); openInvoiceModal('${esc(c.id)}')" title="Nota Fiscal / PIX"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></button>
+              </div>
+            </div>
+            ${nf}${pix}${obs}
+          </div>`;
+      }).join('');
+    }
+
+    function openAddModal(){
+      addPassVerified = false;
+      document.getElementById('addPassGate').style.display = 'block';
+      document.getElementById('addForm').style.display = 'none';
+      document.getElementById('addPass').value = '';
+      document.getElementById('fData').value = new Date().toISOString().split('T')[0];
+      document.getElementById('fTipo').value = '';
+      document.getElementById('fPreco').value = '';
+      document.getElementById('fObs').value = '';
+      openModal('addModal');
+    }
+    function checkAddPass(){
+      if(document.getElementById('addPass').value === ADDPASS){
+        addPassVerified = true;
+        document.getElementById('addPassGate').style.display = 'none';
+        document.getElementById('addForm').style.display = 'block';
+      }else showToast('Senha incorreta', 'error');
+    }
+    async function submitCut(){
+      if(!addPassVerified) return;
+      const tipo = document.getElementById('fTipo').value.trim();
+      const preco = document.getElementById('fPreco').value.trim();
+      const data = document.getElementById('fData').value;
+      if(!tipo || !preco || !data){ showToast('Preencha todos os campos obrigatórios', 'error'); return; }
+      const btn = document.getElementById('addSubmitBtn');
+      btn.disabled = true; btn.textContent = 'Adicionando...';
+      try{
+        const ymd = data.split('-').reverse().join('/');
+        const url = `${APPSSCRIPTURL}?action=add&data=${enc(ymd)}&tipoCorte=${enc(tipo)}&preco=${enc(preco)}&status=${enc('Pendente')}&observacoes=${enc(document.getElementById('fObs').value.trim())}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        if(!json.success) throw new Error(json.error);
+        showToast('Corte adicionado com sucesso!', 'success');
+        closeModal('addModal');
+        await loadData();
+      }catch(err){
+        console.error(err);
+        showToast('Erro ao adicionar. Tente novamente.', 'error');
+      }finally{
+        btn.disabled = false; btn.textContent = 'Adicionar Corte';
+      }
+    }
+
+    function openDetail(id){
+      const cut = allCuts.find(c => String(c.id) === String(id));
+      if(!cut) return;
+      const paid = isPaid(cut);
+      const content = document.getElementById('detailContent');
+      document.getElementById('detailTitle').textContent = `Corte ${cut.id}`;
+      content.innerHTML = `
+        <div class="detail-field"><div class="detail-label">Tipo de Corte</div><div class="detail-value">${esc(cut.tipoCorte)}</div></div>
+        <div class="detail-field"><div class="detail-label">Data</div><div class="detail-value">${formatDate(cut.data)}</div></div>
+        <div class="detail-field"><div class="detail-label">Preço</div><div class="detail-value" style="color:var(--gold)">${formatPrice(cut.preco)}</div></div>
+        <div class="detail-field"><div class="detail-label">Status</div><div class="detail-value"><span class="cut-status ${paid ? 'paid' : 'pending'}">${paid ? 'Pago' : 'Pendente'}</span></div></div>
+        ${cut.dataPagamento ? `<div class="detail-field"><div class="detail-label">Data Pagamento</div><div class="detail-value">${formatDate(cut.dataPagamento)}</div></div>` : ''}
+        ${cut.notaFiscal ? `<div class="detail-field"><div class="detail-label">Nota Fiscal</div><div class="detail-value" style="color:var(--blue)">${esc(cut.notaFiscal)}</div></div>` : ''}
+        ${cut.comprovantePix ? `<div class="detail-field"><div class="detail-label">Comprovante PIX</div><div class="detail-value"><button class="chip blue" onclick="viewPixProof('${esc(cut.id)}')">Ver comprovante</button></div></div>` : ''}
+        ${cut.observacoes ? `<div class="detail-field"><div class="detail-label">Observações</div><div class="detail-value" style="color:var(--text2)">${esc(cut.observacoes)}</div></div>` : ''}
+        <div class="detail-actions">
+          ${!paid ? `<button class="detail-btn pay" onclick="closeModal('detailModal'); openPayModal('${esc(cut.id)}')">Confirmar Pagamento</button>` : ''}
+          <button class="detail-btn invoice" onclick="closeModal('detailModal'); openInvoiceModal('${esc(cut.id)}')">${cut.notaFiscal ? 'Editar Nota Fiscal / PIX' : 'Adicionar Nota Fiscal / PIX'}</button>
+          <button class="detail-btn delete" onclick="closeModal('detailModal'); confirmDelete('${esc(cut.id)}')">Excluir Corte</button>
+        </div>`;
+      openModal('detailModal');
+    }
+
+    function openPayModal(id){
+      const cut = allCuts.find(c => String(c.id) === String(id));
+      if(!cut) return;
+      currentCutId = id;
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('payContent').innerHTML = `
+        <p style="color:var(--text2);margin-bottom:18px;font-size:.9rem">Confirmar pagamento do corte <strong style="color:var(--text)">${esc(cut.tipoCorte)}</strong> por <strong style="color:var(--gold)">${formatPrice(cut.preco)}</strong></p>
+        <div class="form-group">
+          <label class="form-label">Senha para confirmar pagamento</label>
+          <input type="password" class="form-input" id="payPass" placeholder="Matheus-123$" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data do pagamento</label>
+          <input type="date" class="form-input" id="payDate" value="${today}" />
+        </div>
+        <button class="form-submit" onclick="confirmPay('${esc(id)}')">Confirmar Pagamento</button>
+        <button class="form-cancel" onclick="closeModal('payModal')">Cancelar</button>`;
+      openModal('payModal');
+    }
+
+    async function confirmPay(id){
+      if(document.getElementById('payPass').value !== ADDPASS){
+        showToast('Senha incorreta', 'error');
+        return;
+      }
+      const payDate = document.getElementById('payDate').value;
+      try{
+        const formatted = payDate.split('-').reverse().join('/');
+        const url = `${APPSSCRIPTURL}?action=updatePayment&id=${enc(id)}&dataPagamento=${enc(formatted)}&status=${enc('Já Pago')}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        if(!json.success) throw new Error(json.error);
+        showToast('Pagamento confirmado!', 'success');
+        closeModal('payModal');
+        await loadData();
+      }catch(err){
+        console.error(err);
+        showToast('Erro ao confirmar pagamento', 'error');
+      }
+    }
+
+    function openInvoiceModal(id){
+      const cut = allCuts.find(c => String(c.id) === String(id));
+      if(!cut) return;
+      currentCutId = id;
+      document.getElementById('invoiceContent').innerHTML = `
+        <p style="color:var(--text2);margin-bottom:20px;font-size:.9rem">Nota fiscal / comprovante PIX do corte <strong style="color:var(--text)">${esc(cut.tipoCorte)}</strong></p>
+        <div class="form-group">
+          <label class="form-label">Número / código da nota fiscal</label>
+          <input type="text" class="form-input" id="nfInput" value="${esc(cut.notaFiscal || '')}" placeholder="Ex: NF-001234" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Comprovante PIX</label>
+          <input type="text" class="form-input" id="pixInput" value="${esc(cut.comprovantePix || '')}" placeholder="Cole o link ou código do comprovante" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">JÁ PAGO</label>
+          <select class="form-input" id="paidSelect">
+            <option value="Nao">Não</option>
+            <option value="Sim" ${isPaid(cut) ? 'selected' : ''}>Sim</option>
+          </select>
+        </div>
+        <button class="form-submit" onclick="saveInvoice('${esc(id)}')">Salvar</button>
+        <button class="form-cancel" onclick="closeModal('invoiceModal')">Cancelar</button>`;
+      openModal('invoiceModal');
+    }
+
+    function viewPixProof(id){
+      const cut = allCuts.find(c => String(c.id) === String(id));
+      if(!cut || !cut.comprovantePix) return;
+      const value = cut.comprovantePix;
+      if(/^https?:\/\//i.test(value)) window.open(value, '_blank', 'noopener,noreferrer');
+      else showToast(`Comprovante PIX: ${value}`, 'success');
+    }
+
+    async function saveInvoice(id){
+      try{
+        const nf = document.getElementById('nfInput').value.trim();
+        const pix = document.getElementById('pixInput').value.trim();
+        const paid = document.getElementById('paidSelect').value === 'Sim';
+        const status = paid ? 'Já Pago' : 'Pendente';
+        const url = `${APPSSCRIPTURL}?action=updateInvoice&id=${enc(id)}&notaFiscal=${enc(nf)}&comprovantePix=${enc(pix)}&status=${enc(status)}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        if(!json.success) throw new Error(json.error);
+        showToast('Dados salvos!', 'success');
+        closeModal('invoiceModal');
+        await loadData();
+      }catch(err){
+        console.error(err);
+        showToast('Erro ao salvar', 'error');
+      }
+    }
+
+    function confirmDelete(id){
+      showConfirm('⚠️', 'Excluir corte?', 'Essa ação não pode ser desfeita. O registro será removido da planilha.', 'danger', async ()=>{
+        try{
+          const url = `${APPSSCRIPTURL}?action=deleteRow&id=${enc(id)}`;
+          const res = await fetch(url);
+          const json = await res.json();
+          if(!json.success) throw new Error(json.error);
+          showToast('Corte excluído', 'success');
+          await loadData();
+        }catch(err){
+          console.error(err);
+          showToast('Erro ao excluir', 'error');
+        }
+      });
+    }
+
+    function openModal(id){ document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+    function closeModal(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+    document.querySelectorAll('.modal-overlay').forEach(el => el.addEventListener('click', e => { if(e.target === el) closeModal(el.id); }));
+
+    let confirmCb = null;
+    function showConfirm(icon, title, text, type, callback){
+      document.getElementById('confirmIcon').innerHTML = `<span style="font-size:2rem">${icon}</span>`;
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmText').textContent = text;
+      const btn = document.getElementById('confirmYes');
+      btn.className = 'confirm-yes' + (type === 'danger' ? ' danger' : '');
+      confirmCb = callback;
+      btn.onclick = ()=>{ closeConfirm(); if(confirmCb) confirmCb(); };
+      document.getElementById('confirmDialog').classList.add('open');
+    }
+    function closeConfirm(){ document.getElementById('confirmDialog').classList.remove('open'); confirmCb=null; }
+
+    function showToast(msg, type='success'){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      clearTimeout(t.timer);
+      t.timer = setTimeout(()=>t.classList.remove('show'), 2800);
+    }
+
+    function esc(str){
+      if(str == null) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    function enc(str){ return encodeURIComponent(str); }
+  </script>
 </body>
 </html>
