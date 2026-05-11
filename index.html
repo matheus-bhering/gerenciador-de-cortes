@@ -927,11 +927,19 @@ const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","A
 document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin() });
 
 function tryLogin() {
-  const pass = document.getElementById('loginPass').value;
+  const pass = document.getElementById('loginPass').value.trim();
+
   if (pass === LOGIN_PASS) {
     document.getElementById('loginScreen').classList.remove('active');
     document.getElementById('dashScreen').classList.add('active');
-    sessionStorage.setItem('bc_auth','1');
+    document.getElementById('loginError').textContent = '';
+
+    try {
+      sessionStorage.setItem('bc_auth', '1');
+    } catch(e) {
+      console.warn('sessionStorage indisponível');
+    }
+
     loadData();
   } else {
     document.getElementById('loginError').textContent = 'Senha incorreta';
@@ -940,7 +948,10 @@ function tryLogin() {
 }
 
 function logout() {
-  sessionStorage.removeItem('bc_auth');
+  try {
+    sessionStorage.removeItem('bc_auth');
+  } catch(e) {}
+
   document.getElementById('dashScreen').classList.remove('active');
   document.getElementById('loginScreen').classList.add('active');
   document.getElementById('loginPass').value = '';
@@ -948,9 +959,12 @@ function logout() {
 }
 
 if (sessionStorage.getItem('bc_auth') === '1') {
-  document.getElementById('loginScreen').classList.remove('active');
-  document.getElementById('dashScreen').classList.add('active');
-  setTimeout(loadData, 100);
+    document.getElementById('loginScreen').classList.remove('active');
+    document.getElementById('dashScreen').classList.add('active');
+    setTimeout(loadData, 100);
+  }
+} catch(e) {
+  console.warn('sessionStorage indisponível');
 }
 
 // ============================================================
