@@ -1,805 +1,1239 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>CONTROLE DE CORTE</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        /* Old School Black Theme - Alto contraste para fácil visualização */
-        @import url('https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap');
-        
-        :root {
-            --bg: #000000;
-            --surface: #1a1a1a;
-            --surface-2: #2a2a2a;
-            --border: #444444;
-            --text: #f0f0f0;
-            --text-strong: #ffffff;
-            --muted: #888888;
-            --primary: #00aa00; /* Verde old school */
-            --primary-2: #00cc00;
-            --success: #00aa00;
-            --warning: #cc8800;
-            --danger: #cc0000;
-            --whatsapp: #25d366;
-            --radius: 8px;
-            --shadow: 4px 4px 12px rgba(0,0,0,0.8), inset -2px -2px 4px rgba(255,255,255,0.05);
-            --shadow-inset: inset 2px 2px 4px rgba(255,255,255,0.1);
-            --font-old: Georgia, 'Times New Roman', Times, serif;
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font-old);
-            font-size: 16px;
-            line-height: 1.5;
-        }
-
-        a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        button, input, select, textarea {
-            font-family: inherit;
-            font-size: 16px;
-            color: var(--text-strong);
-        }
-
-        input, select, textarea {
-            width: 100%;
-            background: var(--surface-2);
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            padding: 12px 16px;
-            outline: none;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary);
-            box-shadow: var(--shadow);
-            background: var(--surface);
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            color: var(--text);
-            margin: 12px 0 6px;
-            font-weight: 700;
-        }
-
-        /* Botões old school com bevel */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: linear-gradient(145deg, var(--primary), var(--primary-2));
-            color: #000;
-            border: none;
-            border-radius: var(--radius);
-            padding: 14px 20px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: relative;
-            box-shadow: var(--shadow), var(--shadow-inset);
-            transition: all 0.15s;
-        }
-
-        .btn:active {
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.8), inset 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .btn:hover {
-            box-shadow: 6px 6px 16px rgba(0,0,0,0.9), var(--shadow-inset);
-        }
-
-        .btn.secondary {
-            background: linear-gradient(145deg, var(--surface-2), var(--surface));
-            color: var(--text-strong);
-            box-shadow: var(--shadow), var(--shadow-inset);
-        }
-
-        .btn.success { background: linear-gradient(145deg, var(--success), #00cc00); color: #000; }
-        .btn.warning { background: linear-gradient(145deg, var(--warning), #ffaa00); color: #000; }
-        .btn.danger { background: linear-gradient(145deg, var(--danger), #ff4444); color: #fff; }
-        .btn.whatsapp { background: linear-gradient(145deg, var(--whatsapp), #00ff88); color: #000; }
-
-        .btn.sm {
-            padding: 10px 14px;
-            font-size: 14px;
-            border-radius: 6px;
-            width: auto;
-        }
-
-        .row {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .row > * { flex: 1; }
-
-        /* Login */
-        #login {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-
-        .login-card {
-            background: var(--surface);
-            border: 3px solid var(--border);
-            border-radius: 12px;
-            padding: 32px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: var(--shadow);
-            text-align: center;
-            position: relative;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-2));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            margin: 0 auto 16px;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            box-shadow: var(--shadow);
-        }
-
-        .login-card h1 {
-            margin: 0 0 8px;
-            font-size: 24px;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .login-card p {
-            margin: 0 0 24px;
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        /* App */
-        #app {
-            display: none;
-            padding-bottom: 100px;
-            min-height: 100vh;
-        }
-
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 3px solid var(--border);
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: var(--shadow);
-        }
-
-        header .title {
-            font-weight: 700;
-            font-size: 18px;
-            letter-spacing: 1px;
-            flex: 1;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }
-
-        header .icon-btn {
-            background: var(--surface-2);
-            border: 2px solid var(--border);
-            color: var(--text);
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: var(--shadow);
-        }
-
-        header .icon-btn:hover {
-            border-color: var(--primary);
-            box-shadow: 0 0 12px rgba(0,170,0,0.5);
-        }
-
-        header .icon-btn:active {
-            transform: scale(0.95);
-        }
-
-        main {
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .section {
-            background: var(--surface);
-            border: 3px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .section h2 {
-            margin: 0 0 16px;
-            font-size: 16px;
-            color: var(--text-strong);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        }
-
-        .section h2::before {
-            content: '';
-            display: inline-block;
-            width: 6px;
-            height: 20px;
-            background: linear-gradient(180deg, var(--primary), var(--primary-2));
-            border-radius: 3px;
-            box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        /* Filtros */
-        .filter-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-        }
-
-        .filter-grid label {
-            margin: 0 0 6px;
-        }
-
-        .filter-grid select {
-            padding: 12px 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Stats Dashboard */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .stat {
-            background: var(--surface-2);
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px;
-            text-align: center;
-            box-shadow: var(--shadow);
-        }
-
-        .stat.full {
-            grid-column: 1 / -1;
-        }
-
-        .stat .label {
-            font-size: 12px;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .stat .value {
-            font-size: 28px;
-            font-weight: 700;
-            margin-top: 4px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .stat.primary .value { color: var(--primary); }
-        .stat.success .value { color: var(--success); }
-        .stat.warning .value { color: var(--warning); }
-
-        /* Quick actions */
-        .quick {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .quick .full {
-            grid-column: 1 / -1;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 6px;
-            background: var(--surface-2);
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            padding: 6px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-        }
-
-        .tabs button {
-            flex: 1;
-            background: transparent;
-            border: 2px solid transparent;
-            color: var(--muted);
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.2s;
-        }
-
-        .tabs button.active {
-            background: var(--primary);
-            color: #000;
-            border-color: var(--primary);
-            box-shadow: var(--shadow);
-        }
-
-        /* Corte cards */
-        .corte {
-            background: var(--surface-2);
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: var(--shadow);
-        }
-
-        .corte-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .corte .tipo {
-            font-weight: 700;
-            font-size: 16px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        }
-
-        .corte .data {
-            font-size: 13px;
-            color: var(--muted);
-            margin-top: 4px;
-        }
-
-        .corte .preco {
-            font-weight: 700;
-            font-size: 20px;
-            white-space: nowrap;
-            color: var(--primary);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            box-shadow: var(--shadow);
-        }
-
-        .badge.pago {
-            background: rgba(0,170,0,0.2);
-            color: var(--success);
-            border: 1px solid var(--success);
-        }
-
-        .badge.pendente {
-            background: rgba(204,136,0,0.2);
-            color: var(--warning);
-            border: 1px solid var(--warning);
-        }
-
-        .corte .obs {
-            font-size: 14px;
-            color: var(--text);
-            margin-top: 8px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            padding: 12px;
-            background: rgba(255,255,255,0.03);
-            border-left: 4px solid var(--primary);
-        }
-
-        .corte .actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .corte .actions .full {
-            grid-column: 1 / -1;
-        }
-
-        /* Thumbs */
-        .receipt-thumbs {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .receipt-thumb {
-            position: relative;
-            aspect-ratio: 1;
-            background: var(--surface-2);
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            box-shadow: var(--shadow);
-        }
-
-        .receipt-thumb:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-            box-shadow: 0 8px 20px rgba(0,170,0,0.3);
-        }
-
-        .receipt-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .receipt-thumb .ph {
-            font-size: 32px;
-            color: var(--muted);
-        }
-
-        .receipt-thumb .num {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-weight: 700;
-        }
-
-        /* Lightbox */
-        #lightbox {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.98);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 500;
-            padding: 20px;
-            flex-direction: column;
-            backdrop-filter: blur(8px);
-        }
-
-        #lightbox.show {
-            display: flex;
-        }
-
-        #lightbox img {
-            max-width: 95%;
-            max-height: 85vh;
-            border-radius: var(--radius);
-            box-shadow: 0 20px 60px rgba(0,0,0,1);
-            border: 3px solid var(--border);
-        }
-
-        #lightbox .lb-bar {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        #lightbox .lb-bar button, #lightbox .lb-bar a {
-            background: var(--surface);
-            border: 2px solid var(--border);
-            color: var(--text-strong);
-            padding: 12px 20px;
-            border-radius: var(--radius);
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: var(--shadow);
-            transition: all 0.2s;
-        }
-
-        #lightbox .lb-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.15);
-            border: none;
-            color: #fff;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-        }
-
-        /* Modal */
-        .modal-bg {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-            z-index: 200;
-            padding: 0;
-            backdrop-filter: blur(12px);
-        }
-
-        .modal-bg.show {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--surface);
-            width: 100%;
-            max-width: 560px;
-            border-radius: 12px 12px 0 0;
-            padding: 24px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 3px solid var(--border);
-            border-bottom: none;
-            box-shadow: var(--shadow);
-        }
-
-        .modal h3 {
-            margin: 0 0 16px;
-            font-size: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .modal .close {
-            float: right;
-            background: transparent;
-            border: none;
-            color: var(--muted);
-            font-size: 24px;
-            cursor: pointer;
-            line-height: 1;
-            margin-top: -8px;
-        }
-
-        /* Toast */
-        #toast {
-            position: fixed;
-            left: 50%;
-            bottom: 100px;
-            transform: translateX(-50%);
-            background: #2a2a2a;
-            color: #fff;
-            border: 2px solid var(--border);
-            padding: 14px 20px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s;
-            z-index: 300;
-            font-size: 15px;
-            max-width: 90vw;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        #toast.show {
-            opacity: 1;
-            bottom: 120px;
-        }
-
-        #toast.error {
-            border-color: var(--danger);
-            background: rgba(204,0,0,0.9);
-        }
-
-        #toast.success {
-            border-color: var(--success);
-            background: rgba(0,170,0,0.9);
-        }
-
-        /* Loader */
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        #fullLoader {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 400;
-            backdrop-filter: blur(6px);
-        }
-
-        #fullLoader.show {
-            display: flex;
-        }
-
-        #fullLoader .spinner {
-            width: 48px;
-            height: 48px;
-            border-width: 4px;
-            border-top-color: var(--primary);
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 24px 20px;
-            color: var(--muted);
-            font-size: 13px;
-            border-top: 3px solid var(--border);
-            background: var(--bg);
-            margin-top: 40px;
-        }
-
-        /* Empty */
-        .empsize: 13px;
-            border-top: 3px solid var(--bordvar(--muted);
-            padding: 32px;
-            font-size: 16px;
-            font-style: italic;
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-thusize: 13px;
-            border-top: 3px solid var(--bordborder-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="theme-color" content="#0b0d12" id="metaThemeColor" />
+<title>CONTROLE DE CORTE</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  /* =================================================================
+     TEMA BLACK (padrão) — fundo verdadeiramente preto, alto contraste
+     ================================================================= */
+  :root{
+    --bg:#0b0d12;
+    --bg-2:#0f131b;
+    --surface:#151924;
+    --surface-2:#1c2130;
+    --surface-3:#232839;
+    --border:#2a3042;
+    --border-strong:#3a4258;
+    --text:#f5f6fa;
+    --text-soft:#dcdfe8;
+    --muted:#8c95a8;
+    --primary:#7c9bff;
+    --primary-2:#6680e8;
+    --primary-soft:rgba(124,155,255,.15);
+    --success:#2dd17a;
+    --success-soft:rgba(45,209,122,.15);
+    --warning:#ffb547;
+    --warning-soft:rgba(255,181,71,.15);
+    --danger:#ff5d6c;
+    --danger-soft:rgba(255,93,108,.15);
+    --whatsapp:#25d366;
+    --header-bg:rgba(11,13,18,.92);
+    --modal-overlay:rgba(0,0,0,.75);
+    --lightbox-overlay:rgba(0,0,0,.94);
+    --toast-bg:#1c2130;
+    --toast-text:#fff;
+    --pdf-icon-bg:rgba(0,0,0,.65);
+    --logo-grad:linear-gradient(135deg,var(--primary),#9d6cff);
+    --accent-grad:linear-gradient(180deg,var(--primary),#9d6cff);
+    --radius:14px;
+    --shadow:0 6px 22px rgba(0,0,0,.5);
+    --shadow-lg:0 12px 40px rgba(0,0,0,.6);
+  }
+
+  /* =================================================================
+     TEMA CLARO — limpo, leve, fácil leitura
+     ================================================================= */
+  :root[data-theme="light"]{
+    --bg:#f4f6fb;
+    --bg-2:#eaeef6;
+    --surface:#ffffff;
+    --surface-2:#f3f5fa;
+    --surface-3:#e8ecf4;
+    --border:#dbe0ea;
+    --border-strong:#c4cbd9;
+    --text:#161a23;
+    --text-soft:#2c3142;
+    --muted:#6a7383;
+    --primary:#3a5cf0;
+    --primary-2:#2a48d4;
+    --primary-soft:rgba(58,92,240,.12);
+    --success:#0fa968;
+    --success-soft:rgba(15,169,104,.12);
+    --warning:#d68a10;
+    --warning-soft:rgba(214,138,16,.14);
+    --danger:#e0334a;
+    --danger-soft:rgba(224,51,74,.12);
+    --whatsapp:#1aab50;
+    --header-bg:rgba(255,255,255,.92);
+    --modal-overlay:rgba(20,28,46,.45);
+    --lightbox-overlay:rgba(15,20,32,.92);
+    --toast-bg:#161a23;
+    --toast-text:#fff;
+    --pdf-icon-bg:rgba(0,0,0,.72);
+    --logo-grad:linear-gradient(135deg,var(--primary),#7a4dff);
+    --accent-grad:linear-gradient(180deg,var(--primary),#7a4dff);
+    --shadow:0 4px 14px rgba(31,45,80,.08);
+    --shadow-lg:0 10px 30px rgba(31,45,80,.14);
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.45;transition:background .25s ease, color .25s ease}
+  a{color:var(--primary);text-decoration:none}
+  button,input,select,textarea{font-family:inherit;font-size:15px;color:var(--text)}
+  input,select,textarea{
+    width:100%;background:var(--surface-2);border:1px solid var(--border);
+    border-radius:10px;padding:12px 14px;outline:none;transition:border-color .15s, background .25s;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+  label{display:block;font-size:13px;color:var(--muted);margin:10px 0 6px}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--primary);color:#fff;border:none;border-radius:12px;
+    padding:13px 16px;font-weight:600;cursor:pointer;width:100%;
+    transition:transform .05s ease, background .15s ease, opacity .15s;
+  }
+  .btn:active{transform:scale(.98)}
+  .btn:hover{background:var(--primary-2)}
+  .btn.secondary{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
+  .btn.secondary:hover{background:var(--surface-3)}
+  .btn.success{background:var(--success);color:#fff}
+  .btn.warn{background:var(--warning);color:#1a1300}
+  .btn.danger{background:var(--danger);color:#fff}
+  .btn.whatsapp{background:var(--whatsapp);color:#fff}
+  .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+  .btn.sm{padding:9px 12px;font-size:13px;border-radius:10px;font-weight:500}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .row > *{flex:1}
+
+  /* ===== Login ===== */
+  #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg)}
+  .login-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;width:100%;max-width:380px;box-shadow:var(--shadow-lg);text-align:center;position:relative}
+  .login-card .theme-corner{position:absolute;top:14px;right:14px}
+  .logo{
+    width:72px;height:72px;border-radius:50%;
+    background:var(--logo-grad);
+    display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 14px;
+    box-shadow:0 6px 18px var(--primary-soft);
+  }
+  .login-card h1{margin:0 0 6px;font-size:20px;letter-spacing:.5px;color:var(--text)}
+  .login-card p{margin:0 0 22px;color:var(--muted);font-size:13px}
+
+  /* ===== App ===== */
+  #app{display:none;padding-bottom:90px}
+  header{
+    position:sticky;top:0;z-index:10;background:var(--header-bg);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+    padding:12px 14px;display:flex;align-items:center;gap:8px;
+  }
+  header .title{font-weight:700;font-size:15px;letter-spacing:.5px;flex:1;color:var(--text)}
+  header .icon-btn{
+    background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+    transition:background .15s, border-color .15s, transform .05s;
+  }
+  header .icon-btn:hover{background:var(--surface-3);border-color:var(--border-strong)}
+  header .icon-btn:active{transform:scale(.94)}
+  main{padding:14px}
+  .section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .section h2{margin:0 0 12px;font-size:13px;color:var(--text);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .section h2::before{content:"";display:inline-block;width:4px;height:14px;background:var(--accent-grad);border-radius:2px}
+
+  /* Filtros */
+  .filter-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .filter-grid label{margin:0 0 4px}
+  .filter-grid select{padding:10px 12px;font-weight:600}
+
+  /* Comprovante viewer */
+  .receipt-thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:8px}
+  .receipt-thumb{
+    position:relative;aspect-ratio:1/1;background:var(--surface-2);border:1px solid var(--border);
+    border-radius:12px;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  .receipt-thumb:hover{transform:scale(1.03);border-color:var(--primary)}
+  .receipt-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .receipt-thumb .ph{font-size:28px;color:var(--muted)}
+  .receipt-thumb .num{position:absolute;top:6px;left:6px;background:var(--pdf-icon-bg);color:#fff;font-size:11px;padding:2px 7px;border-radius:999px;font-weight:600}
+
+  /* Lightbox */
+  #lightbox{position:fixed;inset:0;background:var(--lightbox-overlay);display:none;align-items:center;justify-content:center;z-index:400;padding:14px;flex-direction:column}
+  #lightbox.show{display:flex}
+  #lightbox img{max-width:100%;max-height:82vh;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+  #lightbox .lb-bar{display:flex;gap:10px;margin-top:14px}
+  #lightbox .lb-bar button,#lightbox .lb-bar a{
+    background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 16px;
+    border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none;font-size:14px;
+  }
+  #lightbox .lb-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.12);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:22px;cursor:pointer}
+
+  /* Dashboard cards */
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px}
+  .stat .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .stat .value{font-size:22px;font-weight:700;margin-top:4px;color:var(--text)}
+  .stat.full{grid-column:1/-1}
+  .stat.success .value{color:var(--success)}
+  .stat.warn .value{color:var(--warning)}
+  .stat.primary .value{color:var(--primary)}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:12px}
+  .tabs button{flex:1;background:transparent;border:none;color:var(--muted);padding:9px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;transition:background .15s, color .15s}
+  .tabs button.active{background:var(--primary);color:#fff}
+
+  /* Card de corte */
+  .corte{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+  .corte-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .corte .tipo{font-weight:600;font-size:14px;color:var(--text)}
+  .corte .data{font-size:12px;color:var(--muted);margin-top:2px}
+  .corte .preco{font-weight:700;font-size:16px;white-space:nowrap;color:var(--text)}
+  .badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+  .badge.pago{background:var(--success-soft);color:var(--success)}
+  .badge.pendente{background:var(--warning-soft);color:var(--warning)}
+  .corte .obs{font-size:13px;color:var(--muted);margin-top:6px;white-space:pre-wrap;word-break:break-word}
+  .corte .actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .corte .actions .full{grid-column:1/-1}
+
+  /* Modal */
+  .modal-bg{
+    position:fixed;inset:0;background:var(--modal-overlay);display:none;
+    align-items:flex-end;justify-content:center;z-index:100;padding:0;
+  }
+  .modal-bg.show{display:flex}
+  .modal{
+    background:var(--surface);width:100%;max-width:520px;
+    border-radius:18px 18px 0 0;padding:18px;max-height:92vh;overflow-y:auto;
+    border:1px solid var(--border);border-bottom:none;color:var(--text);
+  }
+  .modal h3{margin:0 0 12px;font-size:17px}
+  .modal .close{float:right;background:transparent;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1}
+
+  /* Toast */
+  #toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:var(--toast-bg);color:var(--toast-text);border:1px solid var(--border);padding:10px 16px;border-radius:10px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .25s, bottom .25s;z-index:200;font-size:14px;max-width:90vw;text-align:center}
+  #toast.show{opacity:1;bottom:100px}
+  #toast.error{border-color:var(--danger);color:#ffd7da}
+  #toast.success{border-color:var(--success);color:#caf3df}
+
+  /* Loader */
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #fullLoader{position:fixed;inset:0;background:var(--modal-overlay);display:none;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(3px)}
+  #fullLoader.show{display:flex}
+  #fullLoader .spinner{width:42px;height:42px;border-width:3px;border-top-color:var(--primary);border-color:var(--border)}
+
+  /* Footer */
+  footer{text-align:center;padding:18px 14px;color:var(--muted);font-size:12px}
+  .empty{text-align:center;color:var(--muted);padding:18px;font-size:14px}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--border-strong)}
+
+  /* Quick actions */
+  .quick{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .quick .full{grid-column:1/-1}
+
+  /* Theme toggle subtle pulse on click */
+  .icon-btn.theme-toggle svg{transition:transform .35s ease}
+  .icon-btn.theme-toggle:active svg{transform:rotate(180deg)}
+</style>
 </head>
 <body>
-    <!-- LOGIN -->
-    <div id="login">
-        <div class="login-card">
-            <div class="logo">BH</size: 13px;
-            border-top: 3px solid var(--bord<p>Acesso restrito</p>
-            <input id="loginPass" type="password" placeholder="Senha" autocomplete="off">
-            <div style="height:12px"></div>
-            <button csize: 13px;
-            border-top: 3px solid var(--bord   <div id="loginError" stysize: 13px;
-            border-top: 3px solid var(--bordin-height:18px"></div>
-            <div style="margin-top:24px;padding-top:20px;border-top:2px solid var(--border);font-size:12px;color:var(--muted)">
-                Criado por <strong style="color:var(--text-strong)">Matheus Bhesize: 13px;
-            border-top: 3px solid var(--bordv>
 
-    <!-- APP -->
-    <div id="app">
-        <header>
-            <div class="title">CONTROLsize: 13px;
-            border-top: 3px solid var(--bordclick="loadData(true)" title="Atualizar" aria-label="Atualizar">
-                <svg width="20" heightsize: 13px;
-            border-top: 3px solid var(--bordor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="rousize: 13px;
-            border-top: 3px solid var(--bord 10"></polyline>
-                    <polyline points="1 20 1 size: 13px;
-            border-top: 3px solid var(--bord9a9 9size: 13px;
-            border-top: 3px solid var(--bord5"></psize: 13px;
-            border-top: 3px solid var(--bord      <button class="icon-btn" onclick="logout()" title="Sair" aria-label="Sair">
-                <svg width="20" heightsize: 13px;
-            border-top: 3px solid var(--bordor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="rousize: 13px;
-            border-top: 3px solid var(--bord5a2size: 13px;
-            border-top: 3px solid var(--bordints="16 17 21 12 16 7"></polyline>
-                    <line x1size: 13px;
-            border-top: 3px solid var(--bordvg>
-            </button>
-        </heasize: 13px;
-            border-top: 3px solid var(--bord     <div class="section">
-                <h2>Filtrar período</h2>
-                <div clasize: 13px;
-            border-top: 3px solid var(--bord            <label>Ano</label>
-                        <select id="filterYear" onchange="onYearChange()"></select>
-                    </size: 13px;
-            border-top: 3px solid var(--bordlabel>Mês</label>
-                        <select id="filterMonth" onchange="render()"></select>
-                    </div>
-                    <div>
-                        <label>Dsize: 13px;
-            border-top: 3px solid var(--bord" onchange="render()"></select>
-                    </div>
-                </div>
-            </div>
+<!-- ============== LOGIN ============== -->
+<div id="login">
+  <div class="login-card">
+    <button class="icon-btn theme-corner theme-toggle" onclick="toggleTheme()" title="Alternar tema" aria-label="Alternar tema" style="width:36px;height:36px">
+      <svg id="themeIconLogin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></svg>
+    </button>
+    <div class="logo">✂️</div>
+    <h1>CONTROLE DE CORTE</h1>
+    <p>Acesso restrito</p>
+    <input id="loginPass" type="password" placeholder="Senha" autocomplete="off" />
+    <div style="height:12px"></div>
+    <button class="btn" onclick="doLogin()">Entrar</button>
+    <div id="loginError" style="color:var(--danger);font-size:13px;margin-top:10px;min-height:18px"></div>
+    <div style="margin-top:22px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">
+      Criado por <strong style="color:var(--text)">Matheus Bhering</strong>
+    </div>
+  </div>
+</div>
 
-            <!-- Dashbsize: 13px;
-            border-top: 3px solid var(--bord   <h2>Dashboard</h2>
-                <div class="stats">
-                    <div clasize: 13px;
-            border-top: 3px solid var(--bordabel">Cortes no mês</div>
-                        <div class="value" id="dashCortes">0</div>
-                    </div>
-                    <div class="stsize: 13px;
-            border-top: 3px solid var(--bordsto</div>
-                        <div class="value" id="size: 13px;
-            border-top: 3px solid var(--bord                <div class="stat succesize: 13px;
-            border-top: 3px solid var(--bordiv>
-                        <div class="value" id="dashPagos">0</div>
-                    </div>
-                    <div clasize: 13px;
-            border-top: 3px solid var(--bordabel">Pendentes</div>
-                        <div class="size: 13px;
-            border-top: 3px solid var(--bord
+<!-- ============== APP ============== -->
+<div id="app">
+  <header>
+    <div class="title">✂️ CONTROLE DE CORTE</div>
+    <button class="icon-btn theme-toggle" onclick="toggleTheme()" title="Alternar tema" aria-label="Alternar tema">
+      <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></svg>
+    </button>
+    <button class="icon-btn" onclick="loadData(false, true)" title="Atualizar" aria-label="Atualizar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+    </button>
+    <button class="icon-btn" onclick="logout()" title="Sair" aria-label="Sair">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+    </button>
+  </header>
+
+  <main>
+    <!-- Filtro -->
+    <div class="section">
+      <h2>Filtrar período</h2>
+      <div class="filter-grid">
+        <div>
+          <label>Ano</label>
+          <select id="filterYear" onchange="onYearChange()"></select>
+        </div>
+        <div>
+          <label>Mês</label>
+          <select id="filterMonth" onchange="render()"></select>
+        </div>
+        <div>
+          <label>Dia</label>
+          <select id="filterDay" onchange="render()"></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="section">
+      <h2>Dashboard</h2>
+      <div class="stats">
+        <div class="stat primary"><div class="label">Cortes no mês</div><div class="value" id="dashCortes">0</div></div>
+        <div class="stat"><div class="label">Total gasto</div><div class="value" id="dashTotal">R$ 0,00</div></div>
+        <div class="stat success"><div class="label">Pagos</div><div class="value" id="dashPagos">0</div></div>
+        <div class="stat warn"><div class="label">Pendentes</div><div class="value" id="dashPendentes">0</div></div>
+        <div class="stat full success"><div class="label">Já pago</div><div class="value" id="dashJaPago">R$ 0,00</div></div>
+      </div>
+    </div>
+
+    <!-- Ações rápidas -->
+    <div class="section">
+      <h2>Ações</h2>
+      <div class="quick">
+        <button class="btn" onclick="openLancar()">+ Lançar corte</button>
+        <button class="btn secondary" onclick="downloadPDF()">⬇ Baixar mês (PDF)</button>
+        <button class="btn whatsapp full" onclick="enviarResumoWhats()">📊 Enviar resumo p/ Hugo</button>
+        <button class="btn whatsapp full" onclick="conversarHugo()">💬 Conversar com Hugo</button>
+      </div>
+    </div>
+
+    <!-- Pendentes -->
+    <div class="section">
+      <h2>Pendentes de pagamento</h2>
+      <div id="listaPendentes"></div>
+    </div>
+
+    <!-- Histórico -->
+    <div class="section">
+      <h2>Histórico de cortes</h2>
+      <div class="tabs">
+        <button class="active" data-tab="todos" onclick="setTab('todos')">Todos</button>
+        <button data-tab="pendentes" onclick="setTab('pendentes')">Pendentes</button>
+        <button data-tab="pagos" onclick="setTab('pagos')">Pagos</button>
+      </div>
+      <div id="listaHistorico"></div>
+    </div>
+  </main>
+
+  <footer>Criado por: <strong>Matheus Bhering</strong></footer>
+</div>
+
+<!-- ============== MODAIS ============== -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<div id="toast"></div>
+<div id="fullLoader"><div class="spinner"></div></div>
+<div id="lightbox" onclick="if(event.target.id==='lightbox')closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()" aria-label="Fechar">×</button>
+  <img id="lbImg" alt="Comprovante" />
+  <div class="lb-bar">
+    <button onclick="lbPrev()" id="lbPrev">‹ Anterior</button>
+    <a id="lbOpen" target="_blank" rel="noopener">Abrir original ↗</a>
+    <button onclick="lbNext()" id="lbNext">Próximo ›</button>
+  </div>
+</div>
+
+<script>
+/* ============== CONFIG ============== */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo-CLB0__unjyN2Wq6t9r9vq5Fknj3vxXbws-ErK0suF3QtMbRlRgK02McDW2gBIwJlRqpPnxA9QV4/pub?output=csv";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0SBkyNd4EAjl2C_Vv6APbqko-dZKFA_UTARaj1LICgdVrtcPmS5omADftqcwmuI/exec";
+const HUGO_PHONE = "5531971325441";
+const PASS_LOGIN = "Matheus123";
+const PASS_ACOES = "Gatas123";
+
+const CACHE_KEY = "cdc_cache_v1";
+const THEME_KEY = "cdc_theme";
+
+const TABELA_CORTES = [
+  ["Nevou+corte", 130.00],
+  ["Luzes+corte", 130.00],
+  ["Barba", 15.00],
+  ["Sobrancelha", 7.00],
+  ["Pezinho", 7.00],
+  ["Corte disfarçado", 30.00],
+  ["Corte simples+barba", 40.00],
+  ["Corte disfarçado+barba", 45.00],
+  ["Corte simples+barba+sobrancelha", 47.00],
+  ["Corte disfaçado+barba+sobrancelha", 52.00],
+  ["Corte+pigmentação", 45.00],
+  ["Corte navalhado", 35.00],
+  ["Corte+pigmentação+barba+sobrancelha", 67.00],
+  ["Corte+pigmentação+sobrancelha", 52.00],
+  ["Corte disfarçado+sobrancelha", 37.00],
+  ["Corte navalhado+barba", 50.00],
+  ["Corte disfarçado+barba+pigmentação", 60.00],
+  ["Corte Degrade", 30.00],
+  ["Corte degrade+barba", 45.00],
+  ["Corte degrade+barba+sobrancelha", 52.00],
+];
+
+/* ============== STATE ============== */
+let allData = [];
+let currentTab = "todos";
+let lastFetchSignature = "";   // assinatura dos dados últimos confirmados
+let pendingMutationIds = new Set(); // ids excluídos localmente, aguardando o CSV refletir
+
+/* ============== UTILS ============== */
+const $ = s => document.querySelector(s);
+const fmtBRL = n => "R$ " + Number(n||0).toFixed(2).replace(".",",");
+function showLoader(b){ $("#fullLoader").classList.toggle("show", b); }
+function toast(msg, type){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.className = "show " + (type||"");
+  setTimeout(()=>{ t.className = ""; }, 2600);
+}
+function parseDateBR(s){
+  if(!s) return null;
+  if(s instanceof Date) return s;
+  s = String(s).trim();
+  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if(m){ let y = m[3].length===2 ? "20"+m[3] : m[3]; return new Date(+y, +m[2]-1, +m[1]); }
+  m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return new Date(+m[1], +m[2]-1, +m[3]);
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+function fmtDateBR(d){
+  if(!d) return "";
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  return dd+"/"+mm+"/"+d.getFullYear();
+}
+function todayBR(){ return fmtDateBR(new Date()); }
+function todayISO(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function isoToBR(iso){ if(!iso) return ""; const [y,m,d]=iso.split("-"); return `${d}/${m}/${y}`; }
+function parsePreco(v){
+  if(typeof v === "number") return v;
+  if(!v) return 0;
+  return parseFloat(String(v).replace(/[^\d,.-]/g,"").replace(",", ".")) || 0;
+}
+function dataSignature(arr){
+  // assinatura simples para detectar mudanças entre fetches
+  return arr.map(r=>`${r.id}|${r.status}|${r.preco}|${r.dataPagamento}|${r.notaFiscal}`).join("§");
+}
+
+/* CSV parser */
+function parseCSV(text){
+  const rows = []; let cur = []; let val = ""; let inQ = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQ){
+      if(c === '"' && text[i+1] === '"'){ val += '"'; i++; }
+      else if(c === '"'){ inQ = false; }
+      else val += c;
+    } else {
+      if(c === '"') inQ = true;
+      else if(c === ","){ cur.push(val); val=""; }
+      else if(c === "\n"){ cur.push(val); rows.push(cur); cur=[]; val=""; }
+      else if(c === "\r"){}
+      else val += c;
+    }
+  }
+  if(val.length || cur.length){ cur.push(val); rows.push(cur); }
+  return rows;
+}
+
+/* ============== TEMA ============== */
+const SUN_ICON = '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>';
+const MOON_ICON = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+
+function applyTheme(theme){
+  document.documentElement.setAttribute("data-theme", theme);
+  const isLight = theme === "light";
+  const meta = document.getElementById("metaThemeColor");
+  if(meta) meta.setAttribute("content", isLight ? "#f4f6fb" : "#0b0d12");
+  // ícone: sol no escuro (clica p/ ir pra claro), lua no claro (clica p/ ir pro escuro)
+  const icon = isLight ? MOON_ICON : SUN_ICON;
+  const ti = document.getElementById("themeIcon");
+  const til = document.getElementById("themeIconLogin");
+  if(ti) ti.innerHTML = icon;
+  if(til) til.innerHTML = icon;
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme") || "dark";
+  const next = cur === "light" ? "dark" : "light";
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+}
+(function initTheme(){
+  const saved = localStorage.getItem(THEME_KEY) || "dark";
+  applyTheme(saved);
+})();
+
+/* ============== LOGIN ============== */
+function doLogin(){
+  const v = $("#loginPass").value;
+  if(v === PASS_LOGIN){
+    sessionStorage.setItem("logged","1");
+    showApp();
+  } else {
+    $("#loginError").textContent = "Senha incorreta";
+  }
+}
+$("#loginPass").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
+function logout(){
+  sessionStorage.removeItem("logged");
+  $("#app").style.display = "none";
+  $("#login").style.display = "flex";
+  $("#loginPass").value = "";
+  $("#loginError").textContent = "";
+}
+function showApp(){
+  $("#login").style.display = "none";
+  $("#app").style.display = "block";
+
+  // === FIX BUG REFRESH: hidrata a UI a partir do cache local ANTES da rede,
+  //     evitando o "pisca" voltando a zero ou mostrando dados antigos do CSV. ===
+  const cached = loadCache();
+  if(cached && cached.length){
+    allData = cached;
+    lastFetchSignature = dataSignature(allData);
+    buildFilters();
+    render();
+  }
+  loadData(true);
+}
+
+/* ============== CACHE LOCAL ============== */
+function saveCache(arr){
+  try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(), data:arr})); }catch(e){}
+}
+function loadCache(){
+  try{
+    const raw = localStorage.getItem(CACHE_KEY);
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    return Array.isArray(obj?.data) ? obj.data : null;
+  }catch(e){ return null; }
+}
+
+/* ============== DATA ============== */
+async function fetchCsvOnce(){
+  const url = CSV_URL + "&_=" + Date.now() + Math.random().toString(36).slice(2);
+  const res = await fetch(url, {
+    cache: "no-store",
+    headers: { "cache-control": "no-cache", "pragma": "no-cache" }
+  });
+  const txt = await res.text();
+  const rows = parseCSV(txt).filter(r => r.length && r.some(c=>String(c).trim()!==""));
+  if(!rows.length) return [];
+  const headers = rows[0].map(h=>String(h).trim());
+  return rows.slice(1).map(r=>{
+    const o = {};
+    headers.forEach((h,i)=> o[h] = r[i] !== undefined ? String(r[i]).trim() : "");
+    return {
+      id: parseInt(o["Id"]||o["ID"]||o["id"]) || 0,
+      data: o["Data"] || "",
+      tipo: o["Tipo de Corte"] || o["Tipo"] || "",
+      preco: parsePreco(o["Preço"] || o["Preco"]),
+      status: (o["Status"]||"Pendente").trim(),
+      dataPagamento: o["Data Pagamento"] || "",
+      notaFiscal: o["Nota Fiscal"] || "",
+      observacoes: o["Observações"] || o["Observacoes"] || "",
+    };
+  }).filter(r => r.id);
+}
+
+/**
+ * loadData
+ * @param {boolean} silent  Não mostra toast de sucesso
+ * @param {boolean} forceFresh  Faz dupla-leitura para vencer cache do Google CSV
+ */
+async function loadData(silent, forceFresh){
+  showLoader(true);
+  try{
+    let fresh = await fetchCsvOnce();
+
+    // Se ainda contém algum item que sabemos ter sido excluído localmente,
+    // o CSV está atrasado — refazemos uma 2ª leitura após 1.5s.
+    const stillStale = [...pendingMutationIds].some(id => fresh.some(r=>r.id===id));
+    if(stillStale || forceFresh){
+      await new Promise(r=>setTimeout(r, 1500));
+      const fresh2 = await fetchCsvOnce();
+      // só substitui se a 2ª leitura for "mais nova" (não trouxe os ids removidos)
+      const stillStale2 = [...pendingMutationIds].some(id => fresh2.some(r=>r.id===id));
+      if(!stillStale2 || fresh2.length >= fresh.length){
+        fresh = fresh2;
+      }
+    }
+
+    // Reconciliação: se uma exclusão pendente já sumiu do CSV, limpa do set.
+    pendingMutationIds.forEach(id=>{
+      if(!fresh.some(r=>r.id===id)) pendingMutationIds.delete(id);
+    });
+
+    // Não regredir para um estado vazio se já tínhamos dados (proteção contra blip do CSV).
+    if(!fresh.length && allData.length){
+      // mantém o que está em tela
+    } else {
+      allData = fresh;
+      saveCache(allData);
+      lastFetchSignature = dataSignature(allData);
+    }
+
+    buildFilters();
+    render();
+    if(!silent) toast("Dados atualizados", "success");
+  } catch(e){
+    console.error(e);
+    // se falhou e temos cache, mantém o cache; só avisa
+    if(!allData.length){
+      const c = loadCache();
+      if(c){ allData = c; buildFilters(); render(); }
+    }
+    toast("Erro ao carregar dados", "error");
+  } finally{
+    showLoader(false);
+  }
+}
+
+/* ============== FILTROS ============== */
+const MESES_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+function buildFilters(){
+  const yearSel = $("#filterYear");
+  const monthSel = $("#filterMonth");
+  const years = new Set();
+  allData.forEach(r=>{ const d=parseDateBR(r.data); if(d) years.add(d.getFullYear()); });
+  const now = new Date();
+  years.add(now.getFullYear());
+  const yArr = [...years].sort((a,b)=>b-a);
+  const prevY = yearSel.value;
+  yearSel.innerHTML = `<option value="all">Todos os anos</option>` +
+    yArr.map(y=>`<option value="${y}">${y}</option>`).join("");
+  yearSel.value = (prevY && [...yearSel.options].some(o=>o.value===prevY)) ? prevY : String(now.getFullYear());
+
+  const prevM = monthSel.value;
+  monthSel.innerHTML = `<option value="all">Todos os meses</option>` +
+    MESES_PT.map((nm,i)=>`<option value="${i+1}">${nm}</option>`).join("");
+  monthSel.value = prevM || String(now.getMonth()+1);
+
+  rebuildDays();
+}
+
+function onYearChange(){ rebuildDays(); render(); }
+
+function rebuildDays(){
+  const daySel = $("#filterDay");
+  const prev = daySel.value;
+  const y = $("#filterYear").value;
+  const m = $("#filterMonth").value;
+  let max = 31;
+  if(y!=="all" && m!=="all") max = new Date(+y, +m, 0).getDate();
+  daySel.innerHTML = `<option value="all">Todos os dias</option>` +
+    Array.from({length:max},(_,i)=>`<option value="${i+1}">${String(i+1).padStart(2,"0")}</option>`).join("");
+  daySel.value = (prev && +prev<=max) ? prev : "all";
+}
+
+function getFilter(){
+  return {
+    year: $("#filterYear").value,
+    month: $("#filterMonth").value,
+    day: $("#filterDay").value,
+  };
+}
+function matchesFilter(item, f){
+  const d = parseDateBR(item.data);
+  if(!d) return false;
+  if(f.year!=="all" && d.getFullYear()!==+f.year) return false;
+  if(f.month!=="all" && (d.getMonth()+1)!==+f.month) return false;
+  if(f.day!=="all" && d.getDate()!==+f.day) return false;
+  return true;
+}
+function periodLabel(){
+  const f = getFilter();
+  const yTxt = f.year==="all" ? "Todos os anos" : f.year;
+  const mTxt = f.month==="all" ? "Todos os meses" : MESES_PT[+f.month-1];
+  const dTxt = f.day==="all" ? "" : String(f.day).padStart(2,"0");
+  return dTxt ? `${dTxt} de ${mTxt} de ${yTxt}` : `${mTxt} de ${yTxt}`;
+}
+
+/* ============== RENDER ============== */
+function render(){
+  const f = getFilter();
+  // Filtra fora os ids removidos localmente que ainda estão no CSV
+  const visible = allData.filter(r => !pendingMutationIds.has(r.id));
+  const monthData = visible.filter(r=>matchesFilter(r, f));
+
+  const total = monthData.reduce((a,b)=>a+b.preco,0);
+  const pagos = monthData.filter(r=>r.status.toLowerCase()==="pago");
+  const pend = monthData.filter(r=>r.status.toLowerCase()!=="pago");
+  const jaPago = pagos.reduce((a,b)=>a+b.preco,0);
+
+  $("#dashCortes").textContent = monthData.length;
+  $("#dashTotal").textContent = fmtBRL(total);
+  $("#dashPagos").textContent = pagos.length;
+  $("#dashPendentes").textContent = pend.length;
+  $("#dashJaPago").textContent = fmtBRL(jaPago);
+
+  const allPend = visible.filter(r=>r.status.toLowerCase()!=="pago")
+    .sort((a,b)=> (parseDateBR(b.data)||0) - (parseDateBR(a.data)||0));
+  $("#listaPendentes").innerHTML = allPend.length ? allPend.map(corteCard).join("") : `<div class="empty">Nada pendente 🎉</div>`;
+
+  let hist = monthData.slice();
+  if(currentTab==="pendentes") hist = hist.filter(r=>r.status.toLowerCase()!=="pago");
+  if(currentTab==="pagos") hist = hist.filter(r=>r.status.toLowerCase()==="pago");
+  hist.sort((a,b)=> (parseDateBR(b.data)||0) - (parseDateBR(a.data)||0));
+  $("#listaHistorico").innerHTML = hist.length ? hist.map(corteCard).join("") : `<div class="empty">Sem cortes neste filtro</div>`;
+}
+
+function setTab(t){
+  currentTab = t;
+  document.querySelectorAll(".tabs button").forEach(b=> b.classList.toggle("active", b.dataset.tab===t));
+  render();
+}
+
+function corteCard(r){
+  const pago = r.status.toLowerCase()==="pago";
+  const links = extractDriveLinks(r.notaFiscal);
+  return `
+    <div class="corte">
+      <div class="corte-head">
+        <div>
+          <div class="tipo">${escapeHtml(r.tipo||"-")}</div>
+          <div class="data">${escapeHtml(r.data||"-")} ${pago && r.dataPagamento ? "· pago em "+escapeHtml(r.dataPagamento) : ""}</div>
+          <div style="margin-top:6px"><span class="badge ${pago?"pago":"pendente"}">${pago?"Pago":"Pendente"}</span></div>
+        </div>
+        <div class="preco">${fmtBRL(r.preco)}</div>
+      </div>
+      ${r.observacoes ? `<div class="obs">📝 ${escapeHtml(r.observacoes)}</div>` : ""}
+      ${links.length ? `
+        <div style="margin-top:10px">
+          <div style="font-size:12px;color:var(--text-soft);font-weight:600;text-transform:uppercase;letter-spacing:.5px">📎 Comprovantes (${links.length})</div>
+          <div class="receipt-thumbs">
+            ${links.map((l,i)=>{
+              const id = driveId(l);
+              const thumb = id ? `https://drive.google.com/thumbnail?id=${id}&sz=w400` : "";
+              return `<div class="receipt-thumb" onclick='openLightbox(${r.id}, ${i})'>
+                ${thumb ? `<img src="${thumb}" alt="Comprovante ${i+1}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'🖼️'}))" />` : `<div class="ph">📄</div>`}
+                <div class="num">#${i+1}</div>
+              </div>`;
+            }).join("")}
+          </div>
+        </div>` : ""}
+      <div class="actions">
+        ${!pago ? `<button class="btn success sm full" onclick="askPagar(${r.id})">✓ Confirmar pagamento</button>` : ""}
+        <button class="btn secondary sm" onclick="openUpload(${r.id})">📷 Enviar comprovante</button>
+        <button class="btn danger sm" onclick="askDelete(${r.id})">🗑 Excluir</button>
+      </div>
+    </div>
+  `;
+}
+function extractDriveLinks(nf){
+  if(!nf) return [];
+  return String(nf).split(/\s|\n/).map(s=>s.trim()).filter(s=>/^https?:\/\//i.test(s));
+}
+function driveId(url){
+  const m = String(url).match(/\/d\/([a-zA-Z0-9_-]+)/) || String(url).match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ============== LIGHTBOX ============== */
+let lbState = { links: [], idx: 0 };
+function openLightbox(rowId, idx){
+  const r = allData.find(x=>x.id===rowId);
+  if(!r) return;
+  lbState.links = extractDriveLinks(r.notaFiscal);
+  lbState.idx = idx||0;
+  showLightbox();
+  $("#lightbox").classList.add("show");
+}
+function showLightbox(){
+  const url = lbState.links[lbState.idx];
+  const id = driveId(url);
+  $("#lbImg").src = id ? `https://drive.google.com/thumbnail?id=${id}&sz=w1600` : url;
+  $("#lbOpen").href = url;
+  const multi = lbState.links.length > 1;
+  $("#lbPrev").style.display = multi ? "" : "none";
+  $("#lbNext").style.display = multi ? "" : "none";
+}
+function closeLightbox(){ $("#lightbox").classList.remove("show"); $("#lbImg").src=""; }
+function lbPrev(){ lbState.idx = (lbState.idx - 1 + lbState.links.length) % lbState.links.length; showLightbox(); }
+function lbNext(){ lbState.idx = (lbState.idx + 1) % lbState.links.length; showLightbox(); }
+
+/* ============== APPS SCRIPT ============== */
+async function callApi(action, params){
+  const url = new URL(APPS_SCRIPT_URL);
+  url.searchParams.set("action", action);
+  Object.entries(params||{}).forEach(([k,v])=> url.searchParams.set(k, v));
+  if(action === "uploadReceipt"){
+    const fd = new FormData();
+    fd.append("action", action);
+    Object.entries(params||{}).forEach(([k,v])=> fd.append(k, v));
+    const res = await fetch(APPS_SCRIPT_URL, { method:"POST", body: fd });
+    return await res.json();
+  }
+  const res = await fetch(url.toString());
+  return await res.json();
+}
+
+/* ============== MODAL ============== */
+function openModal(html){
+  $("#modalContent").innerHTML = html;
+  $("#modalBg").classList.add("show");
+}
+function closeModal(){ $("#modalBg").classList.remove("show"); }
+$("#modalBg").addEventListener("click", e=>{ if(e.target.id==="modalBg") closeModal(); });
+
+/* ============== LANÇAR CORTE ============== */
+function openLancar(){
+  openModal(`
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>Lançar corte</h3>
+    <p style="color:var(--muted);font-size:13px;margin-top:0">Senha necessária</p>
+    <input id="passLanc" type="password" placeholder="Senha" />
+    <div style="height:10px"></div>
+    <button class="btn" onclick="checkPassLancar()">Continuar</button>
+  `);
+}
+function checkPassLancar(){
+  if($("#passLanc").value !== PASS_ACOES){ toast("Senha incorreta","error"); return; }
+  formLancar();
+}
+function formLancar(){
+  const opts = TABELA_CORTES.map((c,i)=>`<option value="${i}">${c[0]} — ${fmtBRL(c[1])}</option>`).join("");
+  openModal(`
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>Novo corte</h3>
+    <label>Tipo de corte</label>
+    <select id="lTipo" onchange="syncPreco()">${opts}</select>
+    <label>Preço (R$)</label>
+    <input id="lPreco" type="number" step="0.01" />
+    <label>Data</label>
+    <input id="lData" type="date" value="${todayISO()}" />
+    <label>Observações</label>
+    <textarea id="lObs" rows="2" placeholder="Opcional"></textarea>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:14px">
+      <input type="checkbox" id="lPago" style="width:auto" /> Já adicionar como PAGO
+    </label>
+    <div style="height:14px"></div>
+    <button class="btn" onclick="submitLancar()">Salvar corte</button>
+  `);
+  syncPreco();
+}
+function syncPreco(){
+  const i = +$("#lTipo").value;
+  $("#lPreco").value = TABELA_CORTES[i][1].toFixed(2);
+}
+async function submitLancar(){
+  const i = +$("#lTipo").value;
+  const tipo = TABELA_CORTES[i][0];
+  const preco = parseFloat($("#lPreco").value)||TABELA_CORTES[i][1];
+  const data = isoToBR($("#lData").value) || todayBR();
+  const obs = $("#lObs").value || "";
+  const pago = $("#lPago").checked;
+  showLoader(true);
+  try{
+    const r = await callApi("add", {
+      data, tipoCorte: tipo, preco: String(preco),
+      status: pago ? "Pago" : "Pendente",
+      dataPagamento: pago ? data : "",
+      observacoes: obs
+    });
+    if(r.success){
+      toast("Corte lançado!", "success");
+      closeModal();
+      await loadData(true, true);  // force fresh
+    } else toast(r.error||"Erro","error");
+  } catch(e){ toast("Erro de conexão","error"); }
+  finally{ showLoader(false); }
+}
+
+/* ============== CONFIRMAR PAGAMENTO ============== */
+function askPagar(id){
+  openModal(`
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>Confirmar pagamento</h3>
+    <input id="passPag" type="password" placeholder="Senha" />
+    <label>Data do pagamento</label>
+    <input id="dPag" type="date" value="${todayISO()}" />
+    <div style="height:12px"></div>
+    <button class="btn success" onclick="confirmPagar(${id})">Confirmar</button>
+  `);
+}
+async function confirmPagar(id){
+  if($("#passPag").value !== PASS_ACOES){ toast("Senha incorreta","error"); return; }
+  const dataPag = isoToBR($("#dPag").value) || todayBR();
+  showLoader(true);
+  try{
+    const r = await callApi("updatePayment",{ id, dataPagamento: dataPag });
+    if(r.success){
+      // Atualização otimista no cache local
+      const it = allData.find(x=>x.id===id);
+      if(it){ it.status = "Pago"; it.dataPagamento = dataPag; saveCache(allData); render(); }
+      toast("Pagamento confirmado!","success"); closeModal();
+      await loadData(true, true);
+    }
+    else toast(r.error||"Erro","error");
+  } catch(e){ toast("Erro de conexão","error"); }
+  finally{ showLoader(false); }
+}
+
+/* ============== NOTA FISCAL ============== */
+function openInvoice(id){
+  const r = allData.find(x=>x.id===id);
+  openModal(`
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>Código da nota fiscal</h3>
+    <label>Código / texto da nota</label>
+    <input id="invCode" type="text" value="${escapeHtml(r?.notaFiscal||"")}" placeholder="Ex: NF 12345" />
+    <div style="height:12px"></div>
+    <button class="btn" onclick="saveInvoice(${id})">Salvar</button>
+  `);
+}
+async function saveInvoice(id){
+  const v = $("#invCode").value;
+  showLoader(true);
+  try{
+    const r = await callApi("updateInvoice",{ id, notaFiscal: v });
+    if(r.success){ toast("Nota atualizada!","success"); closeModal(); await loadData(true, true); }
+    else toast(r.error||"Erro","error");
+  } catch(e){ toast("Erro de conexão","error"); }
+  finally{ showLoader(false); }
+}
+
+/* ============== UPLOAD COMPROVANTE ============== */
+function openUpload(id){
+  openModal(`
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>Foto do comprovante (Pix)</h3>
+    <p style="color:var(--muted);font-size:13px;margin-top:0">Será enviado para o Drive e linkado na planilha.</p>
+    <input id="upFile" type="file" accept="image/*,application/pdf" />
+    <div style="height:12px"></div>
+    <button class="btn" onclick="doUpload(${id})">Enviar</button>
+  `);
+}
+async function doUpload(id){
+  const f = $("#upFile").files[0];
+  if(!f){ toast("Selecione um arquivo","error"); return; }
+  showLoader(true);
+  try{
+    const b64 = await new Promise((res,rej)=>{
+      const r = new FileReader();
+      r.onload = ()=> res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+    const r = await callApi("uploadReceipt", { id, foto: b64 });
+    if(r.success){ toast("Comprovante enviado!","success"); closeModal(); await loadData(true, true); }
+    else toast(r.error||"Erro no upload","error");
+  } catch(e){ console.error(e); toast("Erro de conexão","error"); }
+  finally{ showLoader(false); }
+}
+
+/* ============== EXCLUIR ============== */
+function askDelete(id){
+  openModal(`
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>Excluir corte</h3>
+    <p style="color:var(--muted);font-size:13px">Essa ação remove o registro da planilha.</p>
+    <input id="passDel" type="password" placeholder="Senha" />
+    <div style="height:12px"></div>
+    <button class="btn danger" onclick="confirmDelete(${id})">Excluir definitivamente</button>
+  `);
+}
+async function confirmDelete(id){
+  if($("#passDel").value !== PASS_ACOES){ toast("Senha incorreta","error"); return; }
+  showLoader(true);
+  try{
+    const r = await callApi("deleteRow",{ id });
+    if(r.success){
+      // Marca como pendente de confirmação no CSV — esconde da UI imediatamente
+      pendingMutationIds.add(id);
+      allData = allData.filter(x=>x.id!==id);
+      saveCache(allData);
+      render();
+      toast("Excluído!","success"); closeModal();
+      await loadData(true, true);
+    }
+    else toast(r.error||"Erro","error");
+  } catch(e){ toast("Erro de conexão","error"); }
+  finally{ showLoader(false); }
+}
+
+/* ============== WHATSAPP ============== */
+function enviarResumoWhats(){
+  const f = getFilter();
+  const data = allData.filter(r=>matchesFilter(r,f) && !pendingMutationIds.has(r.id));
+  const periodo = periodLabel();
+  const total = data.reduce((a,b)=>a+b.preco,0);
+  const pagos = data.filter(r=>r.status.toLowerCase()==="pago");
+  const pend = data.filter(r=>r.status.toLowerCase()!=="pago");
+  const totalPend = pend.reduce((a,b)=>a+b.preco,0);
+
+  let txt = `*Resumo de Cortes — ${periodo}*\n\n`;
+  txt += `✂️ Cortes: ${data.length}\n`;
+  txt += `💰 Total: ${fmtBRL(total)}\n`;
+  txt += `✅ Pagos: ${pagos.length}\n`;
+  txt += `⏳ Pendentes: ${pend.length} (${fmtBRL(totalPend)})\n\n`;
+
+  if(pend.length){
+    txt += `*Pendentes:*\n`;
+    pend.forEach(r=>{ txt += `• ${r.data} — ${r.tipo} — ${fmtBRL(r.preco)}\n`; });
+    txt += `\n`;
+  }
+  if(data.length){
+    txt += `*Detalhamento:*\n`;
+    data.sort((a,b)=>(parseDateBR(a.data)||0)-(parseDateBR(b.data)||0)).forEach(r=>{
+      txt += `${r.data} — ${r.tipo} — ${fmtBRL(r.preco)} [${r.status}]\n`;
+    });
+  }
+
+  const url = `https://wa.me/${HUGO_PHONE}?text=${encodeURIComponent(txt)}`;
+  window.open(url,"_blank");
+}
+function conversarHugo(){
+  window.open(`https://wa.me/${HUGO_PHONE}`,"_blank");
+}
+
+/* ============== PDF PROFISSIONAL ============== */
+function downloadPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:"mm", format:"a4"});
+  const PW = doc.internal.pageSize.getWidth();
+  const PH = doc.internal.pageSize.getHeight();
+
+  const f = getFilter();
+  const periodo = periodLabel();
+  const data = allData.filter(r=>matchesFilter(r,f) && !pendingMutationIds.has(r.id))
+    .sort((a,b)=>(parseDateBR(a.data)||0)-(parseDateBR(b.data)||0));
+  const total = data.reduce((a,b)=>a+b.preco,0);
+  const pagos = data.filter(r=>r.status.toLowerCase()==="pago");
+  const pend = data.filter(r=>r.status.toLowerCase()!=="pago");
+  const totalPag = pagos.reduce((a,b)=>a+b.preco,0);
+  const totalPend = pend.reduce((a,b)=>a+b.preco,0);
+
+  const PRIMARY = [108,140,255];
+  const DARK = [30,35,50];
+  const GRAY = [110,118,135];
+  const LIGHT = [240,242,247];
+  const SUCCESS = [38,160,110];
+  const WARN = [200,130,40];
+
+  doc.setFillColor(...DARK);
+  doc.rect(0, 0, PW, 38, "F");
+  doc.setFillColor(...PRIMARY);
+  doc.rect(0, 38, PW, 2, "F");
+
+  doc.setFillColor(...PRIMARY);
+  doc.circle(20, 19, 8, "F");
+  doc.setTextColor(255,255,255);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(14);
+  doc.text("BH", 20, 21.5, {align:"center"});
+
+  doc.setFontSize(18);
+  doc.text("CONTROLE DE CORTE", 32, 17);
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9.5);
+  doc.setTextColor(180,190,210);
+  doc.text("Relatório financeiro de serviços de barbearia", 32, 23);
+
+  const today = fmtDateBR(new Date());
+  doc.setFontSize(8.5);
+  doc.setTextColor(180,190,210);
+  doc.text(`Emitido em: ${today}`, PW-14, 17, {align:"right"});
+  doc.text(`Documento Nº ${Date.now().toString().slice(-8)}`, PW-14, 22, {align:"right"});
+
+  let yy = 52;
+  doc.setTextColor(...DARK);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(13);
+  doc.text("Relatório do Período", 14, yy);
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(11);
+  doc.setTextColor(...GRAY);
+  doc.text(periodo.charAt(0).toUpperCase()+periodo.slice(1), 14, yy+6);
+
+  yy += 14;
+  doc.setDrawColor(...LIGHT);
+  doc.setFillColor(250,251,253);
+  doc.roundedRect(14, yy, PW-28, 18, 2, 2, "FD");
+  doc.setFontSize(8.5);
+  doc.setTextColor(...GRAY);
+  doc.text("CLIENTE", 18, yy+5);
+  doc.text("PROFISSIONAL", 80, yy+5);
+  doc.text("CONTATO", 142, yy+5);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(10.5);
+  doc.setTextColor(...DARK);
+  doc.text("Matheus Bhering", 18, yy+12);
+  doc.text("Hugo", 80, yy+12);
+  doc.text("(31) 97132-5441", 142, yy+12);
+  doc.setFont("helvetica","normal");
+
+  yy += 26;
+  const cardW = (PW - 28 - 12) / 4;
+  const cards = [
+    {label:"CORTES", value:String(data.length), color:PRIMARY},
+    {label:"TOTAL", value:fmtBRL(total), color:DARK},
+    {label:"PAGO", value:fmtBRL(totalPag), color:SUCCESS},
+    {label:"PENDENTE", value:fmtBRL(totalPend), color:WARN},
+  ];
+  cards.forEach((c,i)=>{
+    const x = 14 + i*(cardW+4);
+    doc.setFillColor(252,253,255);
+    doc.setDrawColor(225,228,235);
+    doc.roundedRect(x, yy, cardW, 22, 2, 2, "FD");
+    doc.setFillColor(...c.color);
+    doc.rect(x, yy, 2, 22, "F");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...GRAY);
+    doc.text(c.label, x+5, yy+6);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(c.value.length>10?11:13);
+    doc.setTextColor(...c.color);
+    doc.text(c.value, x+5, yy+15);
+    doc.setFont("helvetica","normal");
+  });
+
+  yy += 32;
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...DARK);
+  doc.text("Detalhamento dos serviços", 14, yy);
+  yy += 4;
+
+  const cols = [
+    {label:"#",      x:14,  w:10,  align:"left"},
+    {label:"DATA",   x:24,  w:22,  align:"left"},
+    {label:"SERVIÇO",x:46,  w:84,  align:"left"},
+    {label:"VALOR",  x:130, w:24,  align:"right"},
+    {label:"PAGTO",  x:154, w:22,  align:"left"},
+    {label:"STATUS", x:176, w:20,  align:"left"},
+  ];
+  const drawHeader = ()=>{
+    doc.setFillColor(...DARK);
+    doc.rect(14, yy, PW-28, 8, "F");
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(255,255,255);
+    cols.forEach(c=>{
+      const tx = c.align==="right" ? c.x+c.w-2 : c.x+2;
+      doc.text(c.label, tx, yy+5.5, {align:c.align});
+    });
+    yy += 8;
+  };
+  drawHeader();
+
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9);
+  data.forEach((r,i)=>{
+    if(yy > PH-30){ doc.addPage(); yy = 20; drawHeader(); }
+    if(i % 2 === 0){
+      doc.setFillColor(248,249,252);
+      doc.rect(14, yy, PW-28, 7, "F");
+    }
+    doc.setTextColor(...DARK);
+    const row = [
+      String(i+1).padStart(2,"0"),
+      r.data||"-",
+      (r.tipo||"-").length>48 ? r.tipo.slice(0,48)+"…" : (r.tipo||"-"),
+      fmtBRL(r.preco),
+      r.dataPagamento||"—",
+    ];
+    cols.slice(0,5).forEach((c,j)=>{
+      const tx = c.align==="right" ? c.x+c.w-2 : c.x+2;
+      doc.text(String(row[j]), tx, yy+5, {align:c.align});
+    });
+    const pago = r.status.toLowerCase()==="pago";
+    const sx = cols[5].x+2, sy = yy+1.5, sw=18, sh=4.5;
+    doc.setFillColor(...(pago?SUCCESS:WARN));
+    doc.roundedRect(sx, sy, sw, sh, 1, 1, "F");
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(7);
+    doc.setFont("helvetica","bold");
+    doc.text(pago?"PAGO":"PENDENTE", sx+sw/2, sy+3.2, {align:"center"});
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(9);
+    yy += 7;
+  });
+
+  if(!data.length){
+    doc.setTextColor(...GRAY);
+    doc.text("Nenhum corte registrado neste período.", PW/2, yy+8, {align:"center"});
+    yy += 14;
+  }
+
+  yy += 4;
+  if(yy > PH-50){ doc.addPage(); yy = 20; }
+  doc.setDrawColor(...LIGHT);
+  doc.line(14, yy, PW-14, yy);
+  yy += 6;
+
+  const totalsX = PW - 80;
+  doc.setFontSize(10);
+  doc.setTextColor(...GRAY);
+  doc.text("Subtotal de serviços:", totalsX, yy);
+  doc.setTextColor(...DARK);
+  doc.text(fmtBRL(total), PW-14, yy, {align:"right"});
+  yy += 6;
+  doc.setTextColor(...GRAY);
+  doc.text("Total já pago:", totalsX, yy);
+  doc.setTextColor(...SUCCESS);
+  doc.text(fmtBRL(totalPag), PW-14, yy, {align:"right"});
+  yy += 6;
+  doc.setTextColor(...GRAY);
+  doc.text("Total pendente:", totalsX, yy);
+  doc.setTextColor(...WARN);
+  doc.text(fmtBRL(totalPend), PW-14, yy, {align:"right"});
+  yy += 8;
+
+  doc.setFillColor(...DARK);
+  doc.roundedRect(totalsX-4, yy-4, PW-14-(totalsX-4), 11, 1.5, 1.5, "F");
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(12);
+  doc.setTextColor(255,255,255);
+  doc.text("TOTAL GERAL", totalsX, yy+3);
+  doc.text(fmtBRL(total), PW-14, yy+3, {align:"right"});
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for(let p=1; p<=pageCount; p++){
+    doc.setPage(p);
+    doc.setDrawColor(...LIGHT);
+    doc.line(14, PH-16, PW-14, PH-16);
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(8);
+    doc.setTextColor(...GRAY);
+    doc.text("Documento gerado automaticamente pelo sistema CONTROLE DE CORTE.", 14, PH-10);
+    doc.text(`Página ${p} de ${pageCount}`, PW/2, PH-10, {align:"center"});
+    doc.text("Criado por Matheus Bhering", PW-14, PH-10, {align:"right"});
+  }
+
+  const fname = `relatorio-cortes-${(periodo.toLowerCase().replace(/\s+/g,"-"))}.pdf`;
+  doc.save(fname);
+}
+
+/* ============== INIT ============== */
+if(sessionStorage.getItem("logged")==="1"){ showApp(); }
+</script>
+</body>
+</html>
