@@ -73,7 +73,33 @@
   }
   main{padding:14px}
   .section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px;box-shadow:var(--shadow)}
-  .section h2{margin:0 0 12px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+  .section h2{margin:0 0 12px;font-size:13px;color:#e8ebf2;text-transform:uppercase;letter-spacing:1.4px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .section h2::before{content:"";display:inline-block;width:4px;height:14px;background:linear-gradient(180deg,var(--primary),#9d6cff);border-radius:2px}
+  /* Filtros */
+  .filter-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .filter-grid label{margin:0 0 4px}
+  .filter-grid select{padding:10px 12px;font-weight:600}
+  /* Comprovante viewer */
+  .receipt-thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:8px}
+  .receipt-thumb{
+    position:relative;aspect-ratio:1/1;background:var(--surface-2);border:1px solid var(--border);
+    border-radius:12px;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  .receipt-thumb:hover{transform:scale(1.03);border-color:var(--primary)}
+  .receipt-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .receipt-thumb .ph{font-size:28px;color:var(--muted)}
+  .receipt-thumb .num{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.65);color:#fff;font-size:11px;padding:2px 7px;border-radius:999px;font-weight:600}
+  /* Lightbox */
+  #lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:400;padding:14px;flex-direction:column}
+  #lightbox.show{display:flex}
+  #lightbox img{max-width:100%;max-height:82vh;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+  #lightbox .lb-bar{display:flex;gap:10px;margin-top:14px}
+  #lightbox .lb-bar button,#lightbox .lb-bar a{
+    background:var(--surface);border:1px solid var(--border);color:#fff;padding:10px 16px;
+    border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none;font-size:14px;
+  }
+  #lightbox .lb-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.1);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:22px;cursor:pointer}
   /* Dashboard cards */
   .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
   .stat{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px}
@@ -152,6 +178,9 @@
     <div style="height:12px"></div>
     <button class="btn" onclick="doLogin()">Entrar</button>
     <div id="loginError" style="color:var(--danger);font-size:13px;margin-top:10px;min-height:18px"></div>
+    <div style="margin-top:22px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">
+      Criado por <strong style="color:#e8ebf2">Matheus Bhering</strong>
+    </div>
   </div>
 </div>
 
@@ -159,17 +188,32 @@
 <div id="app">
   <header>
     <div class="title">✂️ CONTROLE DE CORTE</div>
-    <button class="icon-btn" onclick="loadData(true)" title="Atualizar">⟳</button>
-    <button class="icon-btn" onclick="logout()" title="Sair">⏻</button>
+    <button class="icon-btn" onclick="loadData(true)" title="Atualizar" aria-label="Atualizar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+    </button>
+    <button class="icon-btn" onclick="logout()" title="Sair" aria-label="Sair">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+    </button>
   </header>
 
   <main>
 
-    <!-- Mês -->
+    <!-- Filtro -->
     <div class="section">
-      <h2>Mês</h2>
-      <div class="month-row">
-        <select id="monthSelect" onchange="render()"></select>
+      <h2>Filtrar período</h2>
+      <div class="filter-grid">
+        <div>
+          <label>Ano</label>
+          <select id="filterYear" onchange="onYearChange()"></select>
+        </div>
+        <div>
+          <label>Mês</label>
+          <select id="filterMonth" onchange="render()"></select>
+        </div>
+        <div>
+          <label>Dia</label>
+          <select id="filterDay" onchange="render()"></select>
+        </div>
       </div>
     </div>
 
@@ -223,9 +267,18 @@
   <div class="modal" id="modalContent"></div>
 </div>
 
-<!-- Toast / loader -->
+<!-- Toast / loader / lightbox -->
 <div id="toast"></div>
 <div id="fullLoader"><div class="spinner"></div></div>
+<div id="lightbox" onclick="if(event.target.id==='lightbox')closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()" aria-label="Fechar">×</button>
+  <img id="lbImg" alt="Comprovante" />
+  <div class="lb-bar">
+    <button onclick="lbPrev()" id="lbPrev">‹ Anterior</button>
+    <a id="lbOpen" target="_blank" rel="noopener">Abrir original ↗</a>
+    <button onclick="lbNext()" id="lbNext">Próximo ›</button>
+  </div>
+</div>
 
 <script>
 /* ============== CONFIG ============== */
@@ -368,7 +421,7 @@ async function loadData(silent){
         observacoes: o["Observações"] || o["Observacoes"] || "",
       };
     }).filter(r => r.id);
-    buildMonthSelect();
+    buildFilters();
     render();
     if(!silent) toast("Dados atualizados", "success");
   } catch(e){
@@ -379,37 +432,71 @@ async function loadData(silent){
   }
 }
 
-/* ============== MONTH SELECT ============== */
-function buildMonthSelect(){
-  const sel = $("#monthSelect");
-  const months = new Set();
-  allData.forEach(r=>{
-    const d = parseDateBR(r.data);
-    if(d) months.add(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"));
-  });
+/* ============== FILTROS (Ano / Mês / Dia) ============== */
+const MESES_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+function buildFilters(){
+  const yearSel = $("#filterYear");
+  const monthSel = $("#filterMonth");
+  const years = new Set();
+  allData.forEach(r=>{ const d=parseDateBR(r.data); if(d) years.add(d.getFullYear()); });
   const now = new Date();
-  months.add(now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0"));
-  const arr = [...months].sort().reverse();
-  const prev = sel.value;
-  sel.innerHTML = arr.map(m=>{
-    const [y,mm]=m.split("-");
-    const nome = new Date(+y,+mm-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
-    return `<option value="${m}">${nome.charAt(0).toUpperCase()+nome.slice(1)}</option>`;
-  }).join("");
-  if(prev && arr.includes(prev)) sel.value = prev;
+  years.add(now.getFullYear());
+  const yArr = [...years].sort((a,b)=>b-a);
+  const prevY = yearSel.value;
+  yearSel.innerHTML = `<option value="all">Todos os anos</option>` +
+    yArr.map(y=>`<option value="${y}">${y}</option>`).join("");
+  yearSel.value = (prevY && [...yearSel.options].some(o=>o.value===prevY)) ? prevY : String(now.getFullYear());
+
+  const prevM = monthSel.value;
+  monthSel.innerHTML = `<option value="all">Todos os meses</option>` +
+    MESES_PT.map((nm,i)=>`<option value="${i+1}">${nm}</option>`).join("");
+  monthSel.value = prevM || String(now.getMonth()+1);
+
+  rebuildDays();
 }
 
-function getCurrentMonth(){ return $("#monthSelect").value || ""; }
-function isInMonth(item, ym){
+function onYearChange(){ rebuildDays(); render(); }
+
+function rebuildDays(){
+  const daySel = $("#filterDay");
+  const prev = daySel.value;
+  const y = $("#filterYear").value;
+  const m = $("#filterMonth").value;
+  let max = 31;
+  if(y!=="all" && m!=="all") max = new Date(+y, +m, 0).getDate();
+  daySel.innerHTML = `<option value="all">Todos os dias</option>` +
+    Array.from({length:max},(_,i)=>`<option value="${i+1}">${String(i+1).padStart(2,"0")}</option>`).join("");
+  daySel.value = (prev && +prev<=max) ? prev : "all";
+}
+
+function getFilter(){
+  return {
+    year: $("#filterYear").value,
+    month: $("#filterMonth").value,
+    day: $("#filterDay").value,
+  };
+}
+function matchesFilter(item, f){
   const d = parseDateBR(item.data);
   if(!d) return false;
-  return (d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")) === ym;
+  if(f.year!=="all" && d.getFullYear()!==+f.year) return false;
+  if(f.month!=="all" && (d.getMonth()+1)!==+f.month) return false;
+  if(f.day!=="all" && d.getDate()!==+f.day) return false;
+  return true;
+}
+function periodLabel(){
+  const f = getFilter();
+  const yTxt = f.year==="all" ? "Todos os anos" : f.year;
+  const mTxt = f.month==="all" ? "Todos os meses" : MESES_PT[+f.month-1];
+  const dTxt = f.day==="all" ? "" : String(f.day).padStart(2,"0");
+  return dTxt ? `${dTxt} de ${mTxt} de ${yTxt}` : `${mTxt} de ${yTxt}`;
 }
 
 /* ============== RENDER ============== */
 function render(){
-  const ym = getCurrentMonth();
-  const monthData = allData.filter(r=>isInMonth(r, ym));
+  const f = getFilter();
+  const monthData = allData.filter(r=>matchesFilter(r, f));
 
   const total = monthData.reduce((a,b)=>a+b.preco,0);
   const pagos = monthData.filter(r=>r.status.toLowerCase()==="pago");
@@ -422,12 +509,10 @@ function render(){
   $("#dashPendentes").textContent = pend.length;
   $("#dashJaPago").textContent = fmtBRL(jaPago);
 
-  // Pendentes (de TODOS, não só do mês)
   const allPend = allData.filter(r=>r.status.toLowerCase()!=="pago")
     .sort((a,b)=> (parseDateBR(b.data)||0) - (parseDateBR(a.data)||0));
   $("#listaPendentes").innerHTML = allPend.length ? allPend.map(corteCard).join("") : `<div class="empty">Nada pendente 🎉</div>`;
 
-  // Histórico
   let hist = monthData.slice();
   if(currentTab==="pendentes") hist = hist.filter(r=>r.status.toLowerCase()!=="pago");
   if(currentTab==="pagos") hist = hist.filter(r=>r.status.toLowerCase()==="pago");
@@ -443,7 +528,7 @@ function setTab(t){
 
 function corteCard(r){
   const pago = r.status.toLowerCase()==="pago";
-  const nfHtml = r.notaFiscal ? renderNF(r.notaFiscal) : "";
+  const links = extractDriveLinks(r.notaFiscal);
   return `
     <div class="corte">
       <div class="corte-head">
@@ -455,25 +540,60 @@ function corteCard(r){
         <div class="preco">${fmtBRL(r.preco)}</div>
       </div>
       ${r.observacoes ? `<div class="obs">📝 ${escapeHtml(r.observacoes)}</div>` : ""}
-      ${nfHtml}
+      ${links.length ? `
+        <div style="margin-top:10px">
+          <div style="font-size:12px;color:#cdd3df;font-weight:600;text-transform:uppercase;letter-spacing:.5px">📎 Comprovantes (${links.length})</div>
+          <div class="receipt-thumbs">
+            ${links.map((l,i)=>{
+              const id = driveId(l);
+              const thumb = id ? `https://drive.google.com/thumbnail?id=${id}&sz=w400` : "";
+              return `<div class="receipt-thumb" onclick='openLightbox(${r.id}, ${i})'>
+                ${thumb ? `<img src="${thumb}" alt="Comprovante ${i+1}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'🖼️'}))" />` : `<div class="ph">📄</div>`}
+                <div class="num">#${i+1}</div>
+              </div>`;
+            }).join("")}
+          </div>
+        </div>` : ""}
       <div class="actions">
-        ${!pago ? `<button class="btn success sm" onclick="askPagar(${r.id})">✓ Confirmar pagamento</button>` : ""}
-        <button class="btn secondary sm" onclick="openInvoice(${r.id})">📄 Nota fiscal</button>
-        <button class="btn secondary sm" onclick="openUpload(${r.id})">📷 Foto comprovante</button>
+        ${!pago ? `<button class="btn success sm full" onclick="askPagar(${r.id})">✓ Confirmar pagamento</button>` : ""}
+        <button class="btn secondary sm" onclick="openUpload(${r.id})">📷 Enviar comprovante</button>
         <button class="btn danger sm" onclick="askDelete(${r.id})">🗑 Excluir</button>
       </div>
     </div>
   `;
 }
-function renderNF(nf){
-  const parts = String(nf).split(/\s|\n/).filter(Boolean);
-  const links = parts.filter(p=>/^https?:\/\//i.test(p));
-  const texts = parts.filter(p=>!/^https?:\/\//i.test(p));
-  let html = "";
-  if(texts.length) html += `<div class="nf">📄 ${escapeHtml(texts.join(" "))}</div>`;
-  if(links.length) html += `<div class="nf">${links.map((l,i)=>`<a href="${l}" target="_blank">🖼 Comprovante ${i+1}</a>`).join("")}</div>`;
-  return html;
+function extractDriveLinks(nf){
+  if(!nf) return [];
+  return String(nf).split(/\s|\n/).map(s=>s.trim()).filter(s=>/^https?:\/\//i.test(s));
 }
+function driveId(url){
+  const m = String(url).match(/\/d\/([a-zA-Z0-9_-]+)/) || String(url).match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ============== LIGHTBOX ============== */
+let lbState = { links: [], idx: 0 };
+function openLightbox(rowId, idx){
+  const r = allData.find(x=>x.id===rowId);
+  if(!r) return;
+  lbState.links = extractDriveLinks(r.notaFiscal);
+  lbState.idx = idx||0;
+  showLightbox();
+  $("#lightbox").classList.add("show");
+}
+function showLightbox(){
+  const url = lbState.links[lbState.idx];
+  const id = driveId(url);
+  $("#lbImg").src = id ? `https://drive.google.com/thumbnail?id=${id}&sz=w1600` : url;
+  $("#lbOpen").href = url;
+  const multi = lbState.links.length > 1;
+  $("#lbPrev").style.display = multi ? "" : "none";
+  $("#lbNext").style.display = multi ? "" : "none";
+}
+function closeLightbox(){ $("#lightbox").classList.remove("show"); $("#lbImg").src=""; }
+function lbPrev(){ lbState.idx = (lbState.idx - 1 + lbState.links.length) % lbState.links.length; showLightbox(); }
+function lbNext(){ lbState.idx = (lbState.idx + 1) % lbState.links.length; showLightbox(); }
 function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
 /* ============== APPS SCRIPT (no-cors via form-encoded) ============== */
@@ -666,16 +786,15 @@ async function confirmDelete(id){
 
 /* ============== WHATSAPP ============== */
 function enviarResumoWhats(){
-  const ym = getCurrentMonth();
-  const data = allData.filter(r=>isInMonth(r,ym));
-  const [y,m]=ym.split("-");
-  const nomeMes = new Date(+y,+m-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+  const f = getFilter();
+  const data = allData.filter(r=>matchesFilter(r,f));
+  const periodo = periodLabel();
   const total = data.reduce((a,b)=>a+b.preco,0);
   const pagos = data.filter(r=>r.status.toLowerCase()==="pago");
   const pend = data.filter(r=>r.status.toLowerCase()!=="pago");
   const totalPend = pend.reduce((a,b)=>a+b.preco,0);
 
-  let txt = `*Resumo de Cortes — ${nomeMes}*\n\n`;
+  let txt = `*Resumo de Cortes — ${periodo}*\n\n`;
   txt += `✂️ Cortes: ${data.length}\n`;
   txt += `💰 Total: ${fmtBRL(total)}\n`;
   txt += `✅ Pagos: ${pagos.length}\n`;
@@ -687,7 +806,7 @@ function enviarResumoWhats(){
     txt += `\n`;
   }
   if(data.length){
-    txt += `*Detalhamento do mês:*\n`;
+    txt += `*Detalhamento:*\n`;
     data.sort((a,b)=>(parseDateBR(a.data)||0)-(parseDateBR(b.data)||0)).forEach(r=>{
       txt += `${r.data} — ${r.tipo} — ${fmtBRL(r.preco)} [${r.status}]\n`;
     });
@@ -700,14 +819,16 @@ function conversarHugo(){
   window.open(`https://wa.me/${HUGO_PHONE}`,"_blank");
 }
 
-/* ============== PDF ============== */
+/* ============== PDF PROFISSIONAL ============== */
 function downloadPDF(){
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const ym = getCurrentMonth();
-  const [y,m]=ym.split("-");
-  const nomeMes = new Date(+y,+m-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
-  const data = allData.filter(r=>isInMonth(r,ym))
+  const doc = new jsPDF({unit:"mm", format:"a4"});
+  const PW = doc.internal.pageSize.getWidth();
+  const PH = doc.internal.pageSize.getHeight();
+
+  const f = getFilter();
+  const periodo = periodLabel();
+  const data = allData.filter(r=>matchesFilter(r,f))
     .sort((a,b)=>(parseDateBR(a.data)||0)-(parseDateBR(b.data)||0));
   const total = data.reduce((a,b)=>a+b.preco,0);
   const pagos = data.filter(r=>r.status.toLowerCase()==="pago");
@@ -715,47 +836,215 @@ function downloadPDF(){
   const totalPag = pagos.reduce((a,b)=>a+b.preco,0);
   const totalPend = pend.reduce((a,b)=>a+b.preco,0);
 
-  doc.setFontSize(16); doc.text("CONTROLE DE CORTE", 14, 18);
-  doc.setFontSize(11); doc.setTextColor(100);
-  doc.text(`Relatório de ${nomeMes}`, 14, 25);
-  doc.text(`Cliente: Matheus Bhering   |   Profissional: Hugo`, 14, 31);
-  doc.setDrawColor(200); doc.line(14, 35, 196, 35);
+  const PRIMARY = [108,140,255];
+  const DARK = [30,35,50];
+  const GRAY = [110,118,135];
+  const LIGHT = [240,242,247];
+  const SUCCESS = [38,160,110];
+  const WARN = [200,130,40];
 
-  doc.setTextColor(0); doc.setFontSize(11);
-  doc.text(`Total de cortes: ${data.length}`, 14, 43);
-  doc.text(`Valor total: ${fmtBRL(total)}`, 14, 50);
-  doc.text(`Pagos: ${pagos.length} (${fmtBRL(totalPag)})`, 14, 57);
-  doc.text(`Pendentes: ${pend.length} (${fmtBRL(totalPend)})`, 14, 64);
+  // ============ HEADER ============
+  doc.setFillColor(...DARK);
+  doc.rect(0, 0, PW, 38, "F");
+  doc.setFillColor(...PRIMARY);
+  doc.rect(0, 38, PW, 2, "F");
 
-  let yy = 76;
-  doc.setFontSize(12); doc.text("Cortes do mês", 14, yy); yy+=6;
-  doc.setFontSize(10);
-  doc.setFillColor(240);
-  doc.rect(14, yy, 182, 7, "F");
-  doc.text("Data", 16, yy+5);
-  doc.text("Tipo", 40, yy+5);
-  doc.text("Preço", 130, yy+5);
-  doc.text("Status", 160, yy+5);
-  yy += 10;
+  // Logo circle
+  doc.setFillColor(...PRIMARY);
+  doc.circle(20, 19, 8, "F");
+  doc.setTextColor(255,255,255);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(14);
+  doc.text("BH", 20, 21.5, {align:"center"});
 
-  data.forEach(r=>{
-    if(yy > 280){ doc.addPage(); yy = 20; }
-    doc.text(String(r.data||""), 16, yy);
-    const tipo = (r.tipo||"").length > 50 ? r.tipo.slice(0,50)+"…" : r.tipo;
-    doc.text(tipo, 40, yy);
-    doc.text(fmtBRL(r.preco), 130, yy);
-    doc.text(r.status||"", 160, yy);
+  doc.setFontSize(18);
+  doc.text("CONTROLE DE CORTE", 32, 17);
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9.5);
+  doc.setTextColor(180,190,210);
+  doc.text("Relatório financeiro de serviços de barbearia", 32, 23);
+
+  // Right side: doc info
+  const today = fmtDateBR(new Date());
+  doc.setFontSize(8.5);
+  doc.setTextColor(180,190,210);
+  doc.text(`Emitido em: ${today}`, PW-14, 17, {align:"right"});
+  doc.text(`Documento Nº ${Date.now().toString().slice(-8)}`, PW-14, 22, {align:"right"});
+
+  // ============ TÍTULO DO PERÍODO ============
+  let yy = 52;
+  doc.setTextColor(...DARK);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(13);
+  doc.text("Relatório do Período", 14, yy);
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(11);
+  doc.setTextColor(...GRAY);
+  doc.text(periodo.charAt(0).toUpperCase()+periodo.slice(1), 14, yy+6);
+
+  // Cliente / Profissional box
+  yy += 14;
+  doc.setDrawColor(...LIGHT);
+  doc.setFillColor(250,251,253);
+  doc.roundedRect(14, yy, PW-28, 18, 2, 2, "FD");
+  doc.setFontSize(8.5);
+  doc.setTextColor(...GRAY);
+  doc.text("CLIENTE", 18, yy+5);
+  doc.text("PROFISSIONAL", 80, yy+5);
+  doc.text("CONTATO", 142, yy+5);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(10.5);
+  doc.setTextColor(...DARK);
+  doc.text("Matheus Bhering", 18, yy+12);
+  doc.text("Hugo", 80, yy+12);
+  doc.text("(31) 97132-5441", 142, yy+12);
+  doc.setFont("helvetica","normal");
+
+  // ============ CARDS DE RESUMO ============
+  yy += 26;
+  const cardW = (PW - 28 - 12) / 4;
+  const cards = [
+    {label:"CORTES", value:String(data.length), color:PRIMARY},
+    {label:"TOTAL", value:fmtBRL(total), color:DARK},
+    {label:"PAGO", value:fmtBRL(totalPag), color:SUCCESS},
+    {label:"PENDENTE", value:fmtBRL(totalPend), color:WARN},
+  ];
+  cards.forEach((c,i)=>{
+    const x = 14 + i*(cardW+4);
+    doc.setFillColor(252,253,255);
+    doc.setDrawColor(225,228,235);
+    doc.roundedRect(x, yy, cardW, 22, 2, 2, "FD");
+    doc.setFillColor(...c.color);
+    doc.rect(x, yy, 2, 22, "F");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...GRAY);
+    doc.text(c.label, x+5, yy+6);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(c.value.length>10?11:13);
+    doc.setTextColor(...c.color);
+    doc.text(c.value, x+5, yy+15);
+    doc.setFont("helvetica","normal");
+  });
+
+  // ============ TABELA ============
+  yy += 32;
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...DARK);
+  doc.text("Detalhamento dos serviços", 14, yy);
+  yy += 4;
+
+  const cols = [
+    {label:"#",      x:14,  w:10,  align:"left"},
+    {label:"DATA",   x:24,  w:22,  align:"left"},
+    {label:"SERVIÇO",x:46,  w:84,  align:"left"},
+    {label:"VALOR",  x:130, w:24,  align:"right"},
+    {label:"PAGTO",  x:154, w:22,  align:"left"},
+    {label:"STATUS", x:176, w:20,  align:"left"},
+  ];
+  const drawHeader = ()=>{
+    doc.setFillColor(...DARK);
+    doc.rect(14, yy, PW-28, 8, "F");
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(255,255,255);
+    cols.forEach(c=>{
+      const tx = c.align==="right" ? c.x+c.w-2 : c.x+2;
+      doc.text(c.label, tx, yy+5.5, {align:c.align});
+    });
+    yy += 8;
+  };
+  drawHeader();
+
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9);
+  data.forEach((r,i)=>{
+    if(yy > PH-30){ doc.addPage(); yy = 20; drawHeader(); }
+    if(i % 2 === 0){
+      doc.setFillColor(248,249,252);
+      doc.rect(14, yy, PW-28, 7, "F");
+    }
+    doc.setTextColor(...DARK);
+    const row = [
+      String(i+1).padStart(2,"0"),
+      r.data||"-",
+      (r.tipo||"-").length>48 ? r.tipo.slice(0,48)+"…" : (r.tipo||"-"),
+      fmtBRL(r.preco),
+      r.dataPagamento||"—",
+    ];
+    cols.slice(0,5).forEach((c,j)=>{
+      const tx = c.align==="right" ? c.x+c.w-2 : c.x+2;
+      doc.text(String(row[j]), tx, yy+5, {align:c.align});
+    });
+    // Status pill
+    const pago = r.status.toLowerCase()==="pago";
+    const sx = cols[5].x+2, sy = yy+1.5, sw=18, sh=4.5;
+    doc.setFillColor(...(pago?SUCCESS:WARN));
+    doc.roundedRect(sx, sy, sw, sh, 1, 1, "F");
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(7);
+    doc.setFont("helvetica","bold");
+    doc.text(pago?"PAGO":"PENDENTE", sx+sw/2, sy+3.2, {align:"center"});
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(9);
     yy += 7;
   });
 
+  if(!data.length){
+    doc.setTextColor(...GRAY);
+    doc.text("Nenhum corte registrado neste período.", PW/2, yy+8, {align:"center"});
+    yy += 14;
+  }
+
+  // ============ TOTAIS ============
+  yy += 4;
+  if(yy > PH-50){ doc.addPage(); yy = 20; }
+  doc.setDrawColor(...LIGHT);
+  doc.line(14, yy, PW-14, yy);
   yy += 6;
-  doc.setDrawColor(200); doc.line(14, yy, 196, yy); yy+=8;
-  doc.setFontSize(11); doc.text(`TOTAL: ${fmtBRL(total)}`, 14, yy);
 
-  doc.setFontSize(9); doc.setTextColor(120);
-  doc.text("Criado por: Matheus Bhering", 14, 290);
+  const totalsX = PW - 80;
+  doc.setFontSize(10);
+  doc.setTextColor(...GRAY);
+  doc.text("Subtotal de serviços:", totalsX, yy);
+  doc.setTextColor(...DARK);
+  doc.text(fmtBRL(total), PW-14, yy, {align:"right"});
+  yy += 6;
+  doc.setTextColor(...GRAY);
+  doc.text("Total já pago:", totalsX, yy);
+  doc.setTextColor(...SUCCESS);
+  doc.text(fmtBRL(totalPag), PW-14, yy, {align:"right"});
+  yy += 6;
+  doc.setTextColor(...GRAY);
+  doc.text("Total pendente:", totalsX, yy);
+  doc.setTextColor(...WARN);
+  doc.text(fmtBRL(totalPend), PW-14, yy, {align:"right"});
+  yy += 8;
 
-  doc.save(`controle-corte-${ym}.pdf`);
+  doc.setFillColor(...DARK);
+  doc.roundedRect(totalsX-4, yy-4, PW-14-(totalsX-4), 11, 1.5, 1.5, "F");
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(12);
+  doc.setTextColor(255,255,255);
+  doc.text("TOTAL GERAL", totalsX, yy+3);
+  doc.text(fmtBRL(total), PW-14, yy+3, {align:"right"});
+
+  // ============ FOOTER em todas as páginas ============
+  const pageCount = doc.internal.getNumberOfPages();
+  for(let p=1; p<=pageCount; p++){
+    doc.setPage(p);
+    doc.setDrawColor(...LIGHT);
+    doc.line(14, PH-16, PW-14, PH-16);
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(8);
+    doc.setTextColor(...GRAY);
+    doc.text("Documento gerado automaticamente pelo sistema CONTROLE DE CORTE.", 14, PH-10);
+    doc.text(`Página ${p} de ${pageCount}`, PW/2, PH-10, {align:"center"});
+    doc.text("Criado por Matheus Bhering", PW-14, PH-10, {align:"right"});
+  }
+
+  const fname = `relatorio-cortes-${(periodo.toLowerCase().replace(/\s+/g,"-"))}.pdf`;
+  doc.save(fname);
 }
 
 /* ============== INIT ============== */
