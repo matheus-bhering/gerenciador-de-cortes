@@ -1,607 +1,134 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CONTROLE DE CORTE</title>
-  <style>
-    :root{
-      --bg:#0b1220;
-      --panel:#111827;
-      --panel2:#0f172a;
-      --line:#223047;
-      --text:#e5e7eb;
-      --muted:#94a3b8;
-      --blue:#2563eb;
-      --green:#16a34a;
-      --red:#dc2626;
-      --amber:#d97706;
-      --chip:#1f2937;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:linear-gradient(180deg,#08111f,#0b1220 35%,#0b1220);
-      color:var(--text);
-    }
-    .wrap{max-width:1300px;margin:0 auto;padding:20px}
-    .card{
-      background:rgba(17,24,39,.96);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:16px;
-      margin:14px 0;
-      box-shadow:0 12px 30px rgba(0,0,0,.22);
-    }
-    .title{font-size:30px;font-weight:800;letter-spacing:.5px;margin:0}
-    .muted{color:var(--muted)}
-    .topbar,.row,.grid{display:grid;gap:12px}
-    .topbar{grid-template-columns:repeat(5,1fr)}
-    .row{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
-    .grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
-    input,select,textarea,button{
-      width:100%;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid #334155;
-      background:#0b1220;
-      color:var(--text);
-      outline:none;
-    }
-    textarea{min-height:96px;resize:vertical}
-    button{
-      cursor:pointer;
-      border:none;
-      font-weight:700;
-      transition:.15s transform ease, .15s opacity ease;
-    }
-    button:hover{transform:translateY(-1px);opacity:.95}
-    .btn-blue{background:var(--blue)}
-    .btn-green{background:var(--green)}
-    .btn-red{background:var(--red)}
-    .btn-amber{background:var(--amber)}
-    .btn-dark{background:#334155}
-    .kpi{
-      background:var(--panel2);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:16px;
-    }
-    .kpi span{display:block;color:var(--muted);font-size:13px}
-    .kpi b{display:block;font-size:28px;margin-top:8px}
-    .tableWrap{overflow:auto}
-    table{width:100%;border-collapse:collapse;min-width:1100px}
-    th,td{
-      padding:10px 8px;
-      border-bottom:1px solid #233247;
-      text-align:left;
-      vertical-align:top;
-      font-size:14px;
-    }
-    th{color:#cbd5e1}
-    .badge{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      background:var(--chip);
-      border:1px solid #334155;
-      font-size:12px;
-      white-space:nowrap;
-    }
-    .hidden{display:none}
-    .split{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .split > *{flex:1}
-    .sectionHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:10px;
-    }
-    .small{font-size:12px}
-    .actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
-    .footer{
-      text-align:center;
-      padding:18px 0 6px;
-      color:var(--muted);
-      font-size:13px;
-    }
-    .loginBox{
-      max-width:520px;
-      margin:50px auto;
-    }
-    .note{
-      border-left:3px solid #3b82f6;
-      padding-left:10px;
-      color:#cbd5e1;
-      margin:8px 0 0;
-    }
-    .dangerText{color:#fca5a5}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>CONTROLE DE CORTE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f0f14;--bg2:#16161d;--bg3:#1e1e28;--bg4:#282835;--gold:#c8a45e;--gold-dim:#9a7d3f;--gold-glow:rgba(200,164,94,.15);--green:#3ecf8e;--green-dim:rgba(62,207,142,.12);--red:#ef6b6b;--red-dim:rgba(239,107,107,.12);--blue:#6ba3ef;--blue-dim:rgba(107,163,239,.12);--purple:#a78bfa;--purple-dim:rgba(167,139,250,.12);--text:#e8e4dd;--text2:#9e99a7;--text3:#5f5b69;--radius:14px;--radius-sm:10px;--shadow:0 4px 24px rgba(0,0,0,.35)}
+html{font-size:16px;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+input,button,select,textarea{font-family:inherit;font-size:inherit;border:none;outline:none;background:none;color:inherit}
+button{cursor:pointer}
+.screen{display:none;min-height:100dvh;padding-bottom:100px;animation:fadeUp .35s ease}.screen.active{display:block}@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+#loginScreen{display:none;min-height:100dvh;justify-content:center;align-items:center;padding:24px;background:radial-gradient(ellipse at 50% 30%,#1a1a26,var(--bg))}#loginScreen.active{display:flex}
+.login-box{width:100%;max-width:360px;text-align:center}.login-logo{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:2px;color:var(--gold);margin-bottom:4px;line-height:1.05}.login-version{color:var(--text3);font-size:.74rem;letter-spacing:1px;margin-bottom:6px}.login-credits{color:var(--text3);font-size:.68rem;margin-bottom:34px;letter-spacing:.4px}
+.login-input-wrap{position:relative;margin-bottom:20px}.login-input-wrap input{width:100%;padding:16px 20px;background:var(--bg3);border:1.5px solid var(--bg4);border-radius:var(--radius);font-size:1rem;color:var(--text);transition:border-color .2s}.login-input-wrap input:focus{border-color:var(--gold)}.login-input-wrap input::placeholder{color:var(--text3)}
+.login-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:var(--bg);font-weight:700;font-size:1rem;border-radius:var(--radius);letter-spacing:.5px;transition:transform .15s}.login-btn:active{transform:scale(.97)}.login-error{color:var(--red);font-size:.85rem;margin-top:14px;min-height:20px}
+.app-header{position:sticky;top:0;z-index:100;background:rgba(15,15,20,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(200,164,94,.08)}
+.header-brand{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:1.8px;color:var(--gold);line-height:1}.header-sub{font-size:.62rem;color:var(--text3);margin-top:2px}.header-actions{display:flex;gap:10px;align-items:center}.header-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border-radius:10px;transition:background .15s}.header-btn:active{background:var(--bg4)}.header-btn svg{width:20px;height:20px;color:var(--text2)}.wa-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px 8px}.wa-action-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 10px;background:rgba(37,211,102,.12);color:#25d366;border:1px solid rgba(37,211,102,.14);border-radius:12px;font-size:.82rem;font-weight:700;line-height:1;min-height:44px;text-align:center}.wa-action-btn svg{width:17px;height:17px;stroke:#25d366;flex:0 0 auto}.wa-action-btn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wa-action-btn:active{transform:scale(.98)}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px}.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:var(--radius);padding:16px}.stat-label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}.stat-value{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:1px}.stat-value.gold{color:var(--gold)}.stat-value.green{color:var(--green)}.stat-value.red{color:var(--red)}.stat-badge{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:20px;margin-top:6px}.stat-badge.pending{background:var(--red-dim);color:var(--red)}
+.month-nav{display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 20px}.month-nav-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border-radius:10px}.month-nav-btn svg{width:18px;height:18px;color:var(--text2)}.month-nav-label{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;min-width:160px;text-align:center}
+.menu-section{margin:0 20px 12px;background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:var(--radius);overflow:hidden}.menu-section-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;user-select:none}.menu-section-title{font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:8px}.menu-section-arrow{transition:transform .25s;color:var(--text3)}.menu-section-arrow.open{transform:rotate(180deg)}.menu-section-body{display:none;border-top:1px solid rgba(255,255,255,.04)}.menu-section-body.open{display:block}
+.pending-list{padding:12px 16px;display:flex;flex-direction:column;gap:8px}.pending-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg3);border-radius:var(--radius-sm);border-left:3px solid var(--red)}.pending-tipo{font-size:.9rem;font-weight:600}.pending-data{font-size:.75rem;color:var(--text2);margin-top:2px}.pending-item-price{font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--red);font-weight:500}.pending-pay-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:var(--green-dim);color:var(--green);border-radius:8px;margin-left:8px;flex-shrink:0}.pending-pay-btn svg{width:14px;height:14px}
+.filter-chip{padding:6px 14px;font-size:.78rem;font-weight:600;border-radius:20px;background:var(--bg3);color:var(--text2);transition:all .15s}.filter-chip.active{background:var(--gold-glow);color:var(--gold)}
+.cuts-list{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}.cut-card{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:var(--radius);padding:16px;transition:transform .12s;position:relative;overflow:hidden}.cut-card:active{transform:scale(.985)}.cut-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}.cut-card.pending::before{background:var(--red)}.cut-card.paid::before{background:var(--green)}.cut-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}.cut-type{font-weight:700;font-size:.95rem}.cut-date{font-size:.78rem;color:var(--text2)}.cut-status{font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}.cut-status.pending{background:var(--red-dim);color:var(--red)}.cut-status.paid{background:var(--green-dim);color:var(--green)}.cut-bottom{display:flex;justify-content:space-between;align-items:center}.cut-price{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:500;color:var(--gold)}.cut-obs{font-size:.75rem;color:var(--text3);margin-top:6px;font-style:italic}.cut-actions{display:flex;gap:8px}.cut-action-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .15s}.cut-action-btn.pay{background:var(--green-dim);color:var(--green)}.cut-action-btn.invoice{background:var(--blue-dim);color:var(--blue)}.cut-action-btn.pix{background:var(--purple-dim);color:var(--purple)}.cut-action-btn:active{transform:scale(.9)}.cut-action-btn svg{width:16px;height:16px}.cut-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}.cut-invoice-tag,.cut-pix-tag{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;padding:3px 8px;border-radius:6px}.cut-invoice-tag{color:var(--blue);background:var(--blue-dim)}.cut-pix-tag{color:var(--purple);background:var(--purple-dim)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3)}.empty-state p{font-size:.9rem}
+.fab{position:fixed;bottom:28px;right:20px;width:58px;height:58px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:var(--bg);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 28px rgba(200,164,94,.35);transition:transform .15s;z-index:90}.fab:active{transform:scale(.9)}.fab svg{width:26px;height:26px}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);justify-content:center;align-items:flex-end;animation:fadeIn .2s}.modal-overlay.open{display:flex}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.modal-sheet{width:100%;max-width:480px;max-height:90dvh;overflow-y:auto;background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 20px 36px;animation:slideUp .3s ease}@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}.modal-handle{width:36px;height:4px;background:var(--bg4);border-radius:4px;margin:0 auto 20px}.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;color:var(--gold);margin-bottom:20px}.form-group{margin-bottom:16px}.form-label{display:block;font-size:.78rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}.form-input{width:100%;padding:14px 16px;background:var(--bg);border:1.5px solid var(--bg4);border-radius:var(--radius-sm);font-size:.95rem;color:var(--text);transition:border-color .2s}.form-input:focus{border-color:var(--gold)}.form-input::placeholder{color:var(--text3)}select.form-input{-webkit-appearance:none;appearance:none}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-submit{width:100%;padding:16px;margin-top:8px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:var(--bg);font-weight:700;font-size:1rem;border-radius:var(--radius);letter-spacing:.5px;transition:transform .15s}.form-submit:active{transform:scale(.97)}.form-submit:disabled{opacity:.5}.form-cancel{width:100%;padding:14px;margin-top:8px;background:var(--bg4);color:var(--text2);font-weight:600;font-size:.9rem;border-radius:var(--radius)}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120px);z-index:999;background:var(--bg3);color:var(--text);padding:14px 24px;border-radius:var(--radius);font-weight:600;font-size:.88rem;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.06);transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}.toast.show{transform:translateX(-50%) translateY(0)}.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--red)}
+.confirm-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.7);justify-content:center;align-items:center;padding:24px}.confirm-overlay.open{display:flex}.confirm-box{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:28px 24px;width:100%;max-width:340px;text-align:center}.confirm-title{font-weight:700;font-size:1.05rem;margin-bottom:8px}.confirm-text{font-size:.85rem;color:var(--text2);margin-bottom:16px;line-height:1.5}.confirm-actions{display:flex;gap:10px}.confirm-actions button{flex:1;padding:12px;border-radius:var(--radius-sm);font-weight:600;font-size:.9rem}.confirm-no{background:var(--bg4);color:var(--text2)}.confirm-yes{background:var(--green);color:#fff}.confirm-yes.danger{background:var(--red)}
+.detail-field{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}.detail-label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}.detail-value{font-size:1rem;font-weight:500}.detail-actions{display:flex;flex-direction:column;gap:10px;margin-top:20px}.detail-btn{padding:14px;border-radius:var(--radius-sm);font-weight:600;font-size:.9rem;display:flex;align-items:center;justify-content:center;gap:8px}.detail-btn.pay{background:var(--green-dim);color:var(--green)}.detail-btn.invoice{background:var(--blue-dim);color:var(--blue)}.detail-btn.pix{background:var(--purple-dim);color:var(--purple)}.detail-btn.delete{background:var(--red-dim);color:var(--red)}
+.pix-img-preview{width:100%;border-radius:var(--radius-sm);border:1px solid var(--bg4);margin-top:12px;object-fit:contain;max-height:300px;background:var(--bg3)}.pix-placeholder{width:100%;padding:32px;background:var(--bg3);border:2px dashed var(--bg4);border-radius:var(--radius-sm);text-align:center;color:var(--text3);font-size:.85rem;margin-top:12px}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="sectionHead">
-        <div>
-          <h1 class="title">CONTROLE DE CORTE</h1>
-          <div class="muted">Criado por: Matheus Bhering</div>
-        </div>
-        <div class="split" style="min-width:min(100%,520px)">
-          <button class="btn-blue" onclick="refreshData()">Refresh</button>
-          <button class="btn-dark" onclick="logout()">Sair do site</button>
-          <button class="btn-dark" onclick="sendSummaryWhatsApp()">Enviar resumo no WhatsApp</button>
-          <button class="btn-dark" onclick="openHugoWhatsApp()">Conversar com Hugo</button>
-          <button class="btn-dark" onclick="downloadMonth()">Baixar mês</button>
-        </div>
-      </div>
+<div id="toast" class="toast"></div>
+<div id="loginScreen" class="screen active">
+  <div class="login-box">
+    <div style="margin-bottom:32px">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" style="margin:0 auto 12px"><path d="M5.5 20.5L3.5 22.5M18.5 20.5L20.5 22.5M7 12C7 12 7.5 14 12 14C16.5 14 17 12 17 12M8 2L8 6M16 2L16 6M12 2L12 4"/><rect x="4" y="6" width="16" height="14" rx="3"/></svg>
+      <div class="login-logo">CONTROLE DE CORTE</div>
+      <div class="login-version">v3.0</div>
+      <div class="login-credits">By Matheus Bhering</div>
     </div>
-
-    <div id="loginView" class="card loginBox">
-      <h2>Login</h2>
-      <div class="row">
-        <input id="loginPass" type="password" placeholder="Senha de login" />
-        <button class="btn-blue" onclick="doLogin()">Entrar</button>
-      </div>
-      <p class="note small">A página de login não exibe nome adicional além do app.</p>
-    </div>
-
-    <div id="appView" class="hidden">
-      <div class="card">
-        <div class="row">
-          <select id="monthFilter" onchange="renderAll()"></select>
-          <select id="historyFilter" onchange="renderHistory()">
-            <option value="ALL">HISTÓRICO: TODOS</option>
-            <option value="Pendente">HISTÓRICO: PENDENTES</option>
-            <option value="Pago">HISTÓRICO: PAGOS</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="grid" id="dashboard"></div>
-
-      <div class="card">
-        <div class="sectionHead">
-          <h2>Pendentes de pagamento</h2>
-          <span class="badge" id="pendingCount">0</span>
-        </div>
-        <div id="pendingList"></div>
-      </div>
-
-      <div class="card">
-        <div class="sectionHead">
-          <h2>Lançar corte</h2>
-          <span class="badge">Senha necessária</span>
-        </div>
-        <div class="row">
-          <input id="adminPass" type="password" placeholder="Senha para lançar / pagar / excluir" />
-          <button class="btn-amber" onclick="unlockActionArea()">Validar senha</button>
-        </div>
-
-        <div id="actionArea" class="hidden" style="margin-top:12px">
-          <div class="row">
-            <select id="cutType"></select>
-            <input id="cutDate" type="date" />
-            <input id="cutObs" type="text" placeholder="Observações" />
-            <label class="badge" style="display:flex;align-items:center;gap:8px;justify-content:center;">
-              <input id="cutPaidNow" type="checkbox" style="width:auto" />
-              Adicionar como já pago
-            </label>
-            <button class="btn-green" onclick="addCut()">Salvar corte</button>
-          </div>
-          <p class="note small">Após adicionar, você pode confirmar pagamento, inserir NF ou enviar comprovante direto no histórico.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="sectionHead">
-          <h2>Histórico de cortes</h2>
-          <span class="badge" id="historyCount">0</span>
-        </div>
-        <div class="tableWrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Data</th>
-                <th>Tipo de Corte</th>
-                <th>Preço</th>
-                <th>Status</th>
-                <th>Data Pagamento</th>
-                <th>Nota Fiscal</th>
-                <th>Observações</th>
-                <th>Comprovante</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="historyBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer">Criado por: Matheus Bhering</div>
+    <div class="login-input-wrap"><input type="password" id="loginPass" placeholder="Digite a senha de acesso" autocomplete="off"></div>
+    <button class="login-btn" type="button" id="loginBtn">ENTRAR</button>
+    <div class="login-error" id="loginError"></div>
   </div>
-
+</div>
+<div id="dashScreen" class="screen">
+  <div class="app-header">
+    <div><div class="header-brand">CONTROLE DE CORTE</div><div class="header-sub">By Matheus Bhering</div></div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="loadData()" title="Recarregar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></button>
+      <button class="header-btn" onclick="logout()" title="Sair"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+    </div>
+  </div>
+  <div class="wa-row">
+    <button class="wa-action-btn" onclick="openShareWA()" title="Enviar Resumo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.52 3.48A11.86 11.86 0 0 0 12.07 0C5.5 0 .15 5.35.15 11.92c0 2.1.55 4.16 1.59 5.97L0 24l6.28-1.65a11.9 11.9 0 0 0 5.79 1.48h.01c6.57 0 11.92-5.35 11.92-11.92 0-3.18-1.24-6.17-3.48-8.43z"></path><path d="M8.2 6.9c-.23-.5-.47-.51-.69-.52h-.59c-.2 0-.52.08-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.09 3.35 5.15 4.56 2.54 1 3.06.8 3.61.75.55-.05 1.77-.72 2.02-1.42.25-.69.25-1.29.17-1.42-.07-.12-.27-.2-.57-.35-.3-.15-1.77-.87-2.05-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.41-1.5-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.63-.94-2.21z"></path></svg><span>Enviar Resumo</span></button>
+    <button class="wa-action-btn" onclick="openWAHugo()" title="Conversar com Hugo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.52 3.48A11.86 11.86 0 0 0 12.07 0C5.5 0 .15 5.35.15 11.92c0 2.1.55 4.16 1.59 5.97L0 24l6.28-1.65a11.9 11.9 0 0 0 5.79 1.48h.01c6.57 0 11.92-5.35 11.92-11.92 0-3.18-1.24-6.17-3.48-8.43z"></path><path d="M8.2 6.9c-.23-.5-.47-.51-.69-.52h-.59c-.2 0-.52.08-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.09 3.35 5.15 4.56 2.54 1 3.06.8 3.61.75.55-.05 1.77-.72 2.02-1.42.25-.69.25-1.29.17-1.42-.07-.12-.27-.2-.57-.35-.3-.15-1.77-.87-2.05-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.41-1.5-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.63-.94-2.21z"></path></svg><span>Conversar com Hugo</span></button>
+  </div>
+  <div class="month-nav"><button class="month-nav-btn" onclick="changeMonth(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button><div class="month-nav-label" id="monthLabel"></div><button class="month-nav-btn" onclick="changeMonth(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button></div>
+  <div class="stats-row"><div class="stat-card"><div class="stat-label">Cortes no mês</div><div class="stat-value gold" id="statTotal">—</div></div><div class="stat-card"><div class="stat-label">Total gasto</div><div class="stat-value" id="statGasto">—</div></div><div class="stat-card"><div class="stat-label">Pagos</div><div class="stat-value green" id="statPagos">—</div></div><div class="stat-card"><div class="stat-label">Pendentes</div><div class="stat-value red" id="statPend">—</div><div class="stat-badge pending" id="statPendVal" style="display:none"><span id="statPendText"></span></div></div></div>
+  <div class="menu-section"><div class="menu-section-header" onclick="toggleMenu('pendentesMenu')"><div class="menu-section-title">💰 Pendentes de pagamento</div><svg class="menu-section-arrow" id="pendentesMenuArrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div><div class="menu-section-body" id="pendentesMenu"><div class="pending-list" id="pendingPayList"></div></div></div>
+  <div class="menu-section"><div class="menu-section-header" onclick="toggleMenu('historicoMenu')"><div class="menu-section-title">📋 Histórico de Cortes</div><svg class="menu-section-arrow open" id="historicoMenuArrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div><div class="menu-section-body open" id="historicoMenu"><div style="padding:12px 16px 8px;display:flex;gap:6px"><button class="filter-chip active" onclick="setFilter('all',this)">TODOS</button><button class="filter-chip" onclick="setFilter('pending',this)">PENDENTES</button><button class="filter-chip" onclick="setFilter('paid',this)">PAGOS</button></div><div id="cutsList" class="cuts-list"></div></div></div>
+  <button class="fab" onclick="openAddModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></button>
+</div>
+<div class="modal-overlay" id="addModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">✂️ Novo Corte</div><div id="addPassGate"><div class="form-group"><label class="form-label">Senha de registro</label><input type="password" class="form-input" id="addPass" placeholder="Senha para adicionar corte"></div><button class="form-submit" onclick="checkAddPass()">Confirmar</button><button class="form-cancel" onclick="closeModal('addModal')">Cancelar</button></div><div id="addForm" style="display:none"><div class="form-group"><label class="form-label">Tipo de corte</label><select class="form-input" id="fTipo" onchange="autoFillPrice()"><option value="">Selecione o tipo de corte...</option><option value="Nevou+corte" data-price="130.00">Nevou+corte — R$ 130,00</option><option value="Luzes+corte" data-price="130.00">Luzes+corte — R$ 130,00</option><option value="Barba" data-price="15.00">Barba — R$ 15,00</option><option value="Sobrancelha" data-price="7.00">Sobrancelha — R$ 7,00</option><option value="Pezinho" data-price="7.00">Pezinho — R$ 7,00</option><option value="Corte disfarçado" data-price="30.00">Corte disfarçado — R$ 30,00</option><option value="Corte simples+barba" data-price="40.00">Corte simples+barba — R$ 40,00</option><option value="Corte disfarçado+barba" data-price="45.00">Corte disfarçado+barba — R$ 45,00</option><option value="Corte simples+barba+sobrancelha" data-price="47.00">Corte simples+barba+sobrancelha — R$ 47,00</option><option value="Corte disfarçado+barba+sobrancelha" data-price="52.00">Corte disfarçado+barba+sobrancelha — R$ 52,00</option><option value="Corte+pigmentação" data-price="45.00">Corte+pigmentação — R$ 45,00</option><option value="Corte navalhado" data-price="35.00">Corte navalhado — R$ 35,00</option><option value="Corte+pigmentação+barba+sobrancelha" data-price="67.00">Corte+pigmentação+barba+sobrancelha — R$ 67,00</option><option value="Corte+pigmentação+sobrancelha" data-price="52.00">Corte+pigmentação+sobrancelha — R$ 52,00</option><option value="Corte disfarçado+sobrancelha" data-price="37.00">Corte disfarçado+sobrancelha — R$ 37,00</option><option value="Corte navalhado+barba" data-price="50.00">Corte navalhado+barba — R$ 50,00</option><option value="Corte disfarçado+barba+pigmentação" data-price="60.00">Corte disfarçado+barba+pigmentação — R$ 60,00</option><option value="Corte Degrade" data-price="30.00">Corte Degrade — R$ 30,00</option><option value="Corte degrade+barba" data-price="45.00">Corte degrade+barba — R$ 45,00</option><option value="Corte degrade+barba+sobrancelha" data-price="52.00">Corte degrade+barba+sobrancelha — R$ 52,00</option></select></div><div class="form-row"><div class="form-group"><label class="form-label">Preço (R$)</label><input type="text" class="form-input" id="fPreco" placeholder="0,00"></div><div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="fData"></div></div><div class="form-group"><label class="form-label">Observações</label><input type="text" class="form-input" id="fObs" placeholder="Opcional"></div><div class="form-group" style="display:flex;align-items:center;gap:10px;padding:8px 0"><input type="checkbox" id="fJaPago" style="width:18px;height:18px;accent-color:var(--green)"><label for="fJaPago" style="font-size:.9rem;color:var(--text2);font-weight:600">✅ JÁ PAGO</label></div><button class="form-submit" id="addSubmitBtn" onclick="submitCut()">Adicionar Corte</button><button class="form-cancel" onclick="closeModal('addModal')">Cancelar</button></div></div></div>
+<div class="modal-overlay" id="detailModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title" id="detailTitle">Detalhes do Corte</div><div id="detailContent"></div></div></div>
+<div class="modal-overlay" id="payModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">💰 Confirmar Pagamento</div><div id="payContent"></div></div></div>
+<div class="modal-overlay" id="invoiceModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">📄 Nota Fiscal</div><div id="invoiceContent"></div></div></div>
+<div class="modal-overlay" id="pixModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">💜 Comprovante Pix</div><div id="pixContent"></div></div></div>
+<div class="modal-overlay" id="pixViewModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">🔍 Ver Comprovante</div><div id="pixViewContent"></div></div></div>
+<div class="confirm-overlay" id="confirmDialog"><div class="confirm-box"><div class="confirm-title" id="confirmTitle"></div><div class="confirm-text" id="confirmText"></div><div class="confirm-actions"><button class="confirm-no" onclick="closeConfirm()">Cancelar</button><button class="confirm-yes" id="confirmYes">Confirmar</button></div></div></div>
 <script>
-const APPS_SCRIPT_URL = "COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT";
-const HUGO_WA = "5531971325441";
-const LOGIN_PASS = "Matheus123";
-const ADMIN_PASS = "Matheus-123$";
-
-const CUTS = [
-  ["Nevou+corte",130],
-  ["Luzes+corte",130],
-  ["Barba",15],
-  ["Sobrancelha",7],
-  ["Pezinho",7],
-  ["Corte disfarçado",30],
-  ["Corte simples+barba",40],
-  ["Corte disfarçado+barba",45],
-  ["Corte simples+barba+sobrancelha",47],
-  ["Corte disfaçado+barba+sobrancelha",52],
-  ["Corte+pigmentação",45],
-  ["Corte navalhado",35],
-  ["Corte+pigmentação+barba +sobrancelha",67],
-  ["Corte+pigmentação+sobrancelha",52],
-  ["Corte disfarçado+sobrancelha",37],
-  ["Corte navalhado+barba",50],
-  ["Corte disfarçado +barba +pigmentação",60],
-  ["Corte Degrade",30],
-  ["Corte degrade +barba",45],
-  ["Corte degrade+barba+sobrancelha",52]
-];
-
-let rows = [];
-let currentMonth = "ALL";
-
-function money(v){
-  const n = Number(v || 0);
-  return "R$ " + n.toFixed(2);
-}
-
-function dateMonthKey(v){
-  if(!v) return "";
-  const s = String(v).trim();
-  if (s.includes("-")) return s.slice(0,7);
-  const p = s.split("/");
-  if (p.length === 3) return `${p[2]}-${p[1]}`;
-  return "";
-}
-
-function dateBR(){
-  const d = new Date();
-  return d.toLocaleDateString("pt-BR");
-}
-
-function todayISO(){
-  return new Date().toISOString().slice(0,10);
-}
-
-function qs(params){
-  const u = new URL(APPS_SCRIPT_URL);
-  Object.entries(params).forEach(([k,v]) => u.searchParams.set(k, v));
-  return u.toString();
-}
-
-async function api(params){
-  const r = await fetch(qs(params), { method: "GET" });
-  return await r.json();
-}
-
-function openHugoWhatsApp(){
-  window.open(`https://wa.me/${HUGO_WA}`, "_blank");
-}
-
-function sendSummaryWhatsApp(){
-  const d = filteredRows();
-  const total = d.reduce((s,r)=>s + Number(r["Preço"] || 0), 0);
-  const paid = d.filter(r=>String(r["Status"]).toLowerCase() === "pago");
-  const pending = d.filter(r=>String(r["Status"]).toLowerCase() !== "pago");
-
-  const text = [
-    "Resumo dos cortes",
-    `Mês: ${monthFilter.value === "ALL" ? "Todos" : monthFilter.value}`,
-    `Cortes no mês: ${d.length}`,
-    `Total gasto: ${money(total)}`,
-    `Pagos: ${paid.length}`,
-    `Pendentes: ${pending.length}`
-  ].join("\\n");
-
-  window.open(`https://wa.me/${HUGO_WA}?text=${encodeURIComponent(text)}`, "_blank");
-}
-
-function logout(){
-  localStorage.removeItem("cc_login");
-  location.reload();
-}
-
-function doLogin(){
-  if(document.getElementById("loginPass").value === LOGIN_PASS){
-    localStorage.setItem("cc_login", "1");
-    document.getElementById("loginView").classList.add("hidden");
-    document.getElementById("appView").classList.remove("hidden");
-    loadCutOptions();
-    setDefaultDate();
-    refreshData();
-  } else {
-    alert("Senha incorreta.");
-  }
-}
-
-function unlockActionArea(){
-  if(document.getElementById("adminPass").value === ADMIN_PASS){
-    document.getElementById("actionArea").classList.remove("hidden");
-  } else {
-    alert("Senha incorreta.");
-  }
-}
-
-function loadCutOptions(){
-  const el = document.getElementById("cutType");
-  el.innerHTML = CUTS.map(c => `<option value="${c[0]}|${c[1]}">${c[0]} - ${money(c[1])}</option>`).join("");
-}
-
-function setDefaultDate(){
-  document.getElementById("cutDate").value = todayISO();
-}
-
-function normalizeMonthOptions(){
-  const months = [...new Set(rows.map(r => dateMonthKey(r["Data"])).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
-  const select = document.getElementById("monthFilter");
-  select.innerHTML = `<option value="ALL">Todos os meses</option>` + months.map(m => `<option value="${m}">${m}</option>`).join("");
-}
-
-function filteredRows(){
-  if(currentMonth === "ALL") return rows;
-  return rows.filter(r => dateMonthKey(r["Data"]) === currentMonth);
-}
-
-function renderDashboard(){
-  const d = filteredRows();
-  const total = d.reduce((s,r)=>s + Number(r["Preço"] || 0), 0);
-  const paid = d.filter(r => String(r["Status"]).toLowerCase() === "pago");
-  const pending = d.filter(r => String(r["Status"]).toLowerCase() !== "pago");
-  const paidTotal = paid.reduce((s,r)=>s + Number(r["Preço"] || 0), 0);
-
-  document.getElementById("dashboard").innerHTML = [
-    ["CORTES NO MÊS", d.length],
-    ["TOTAL GASTO", money(total)],
-    ["PAGOS", paid.length],
-    ["PENDENTES", pending.length],
-    ["JÁ PAGO", money(paidTotal)]
-  ].map(x => `
-    <div class="kpi">
-      <span>${x[0]}</span>
-      <b>${x[1]}</b>
-    </div>
-  `).join("");
-}
-
-function renderPending(){
-  const pending = filteredRows().filter(r => String(r["Status"]).toLowerCase() !== "pago");
-  document.getElementById("pendingCount").textContent = pending.length;
-  const box = document.getElementById("pendingList");
-  if(!pending.length){
-    box.innerHTML = `<p class="muted">Não há pendências neste mês.</p>`;
-    return;
-  }
-
-  box.innerHTML = pending.map(r => cardHTML(r, true)).join("");
-}
-
-function renderHistory(){
-  const filter = document.getElementById("historyFilter").value;
-  const d = filteredRows().filter(r => filter === "ALL" ? true : String(r["Status"]) === filter);
-  document.getElementById("historyCount").textContent = d.length;
-  document.getElementById("historyBody").innerHTML = d.map(r => rowHTML(r)).join("");
-}
-
-function renderAll(){
-  currentMonth = document.getElementById("monthFilter").value;
-  renderDashboard();
-  renderPending();
-  renderHistory();
-}
-
-function cardHTML(r, isPending){
-  const id = r["Id"];
-  return `
-    <div class="card" style="margin:10px 0">
-      <div class="sectionHead">
-        <div>
-          <b>#${id} - ${r["Tipo de Corte"] || ""}</b>
-          <div class="muted">${r["Data"] || ""} • ${money(r["Preço"])}</div>
-        </div>
-        <span class="badge">${r["Status"] || ""}</span>
-      </div>
-
-      <div class="muted small">${r["Observações"] || ""}</div>
-
-      <div class="row" style="margin-top:12px">
-        <input id="nf_${id}" placeholder="Inserir código da nota fiscal" value="${r["Nota Fiscal"] || ""}" />
-        <input id="file_${id}" type="file" accept="image/*,application/pdf" />
-        <input id="obs_${id}" placeholder="Atualizar observações" value="${r["Observações"] || ""}" />
-      </div>
-
-      <div class="actions" style="margin-top:10px">
-        <button class="btn-green" onclick="confirmPayment('${id}')">Confirmar pagamento</button>
-        <button class="btn-dark" onclick="saveInvoice('${id}')">Inserir NF</button>
-        <button class="btn-dark" onclick="uploadProof('${id}')">Enviar foto do comprovante PIX</button>
-        <button class="btn-red" onclick="deleteCut('${id}')">Excluir corte</button>
-      </div>
-    </div>
-  `;
-}
-
-function rowHTML(r){
-  const id = r["Id"];
-  const proof = r["Comprovante"] || r["Link Comprovante"] || "";
-  return `
-    <tr>
-      <td>${id}</td>
-      <td>${r["Data"] || ""}</td>
-      <td>${r["Tipo de Corte"] || ""}</td>
-      <td>${money(r["Preço"])}</td>
-      <td><span class="badge">${r["Status"] || ""}</span></td>
-      <td>${r["Data Pagamento"] || ""}</td>
-      <td>${r["Nota Fiscal"] || ""}</td>
-      <td>${r["Observações"] || ""}</td>
-      <td>${proof ? `<a href="${proof}" target="_blank">Abrir</a>` : "-"}</td>
-      <td>
-        <div class="actions" style="grid-template-columns:1fr;min-width:180px">
-          <button class="btn-green" onclick="confirmPayment('${id}')">Pagar</button>
-          <button class="btn-dark" onclick="saveInvoice('${id}')">NF</button>
-          <button class="btn-red" onclick="deleteCut('${id}')">Excluir</button>
-        </div>
-      </td>
-    </tr>
-  `;
-}
-
-async function refreshData(){
-  const j = await api({ action: "read" });
-  rows = j.data || [];
-  normalizeMonthOptions();
-  renderAll();
-}
-
-async function addCut(){
-  if(document.getElementById("adminPass").value !== ADMIN_PASS) return alert("Senha inválida.");
-  const [tipo, preco] = document.getElementById("cutType").value.split("|");
-  const params = {
-    action: "add",
-    data: document.getElementById("cutDate").value || todayISO(),
-    tipoCorte: tipo,
-    preco: preco,
-    status: document.getElementById("cutPaidNow").checked ? "Pago" : "Pendente",
-    dataPagamento: document.getElementById("cutPaidNow").checked ? dateBR() : "",
-    notaFiscal: "",
-    observacoes: document.getElementById("cutObs").value || ""
-  };
-  const j = await api(params);
-  if(j.success){
-    await refreshData();
-    alert("Corte adicionado.");
-  } else {
-    alert(j.error || "Erro ao adicionar.");
-  }
-}
-
-async function confirmPayment(id){
-  if(document.getElementById("adminPass").value !== ADMIN_PASS) return alert("Senha inválida.");
-  const j = await api({
-    action: "updatePayment",
-    id: id,
-    dataPagamento: dateBR()
-  });
-  if(j.success){
-    await refreshData();
-    alert("Pagamento confirmado.");
-  } else {
-    alert(j.error || "Erro ao confirmar.");
-  }
-}
-
-async function saveInvoice(id){
-  if(document.getElementById("adminPass").value !== ADMIN_PASS) return alert("Senha inválida.");
-  const nf = document.getElementById("nf_" + id).value || "";
-  const obs = document.getElementById("obs_" + id).value || "";
-  const j = await api({
-    action: "updateInvoice",
-    id: id,
-    notaFiscal: nf,
-    observacoes: obs
-  });
-  if(j.success){
-    await refreshData();
-    alert("Nota fiscal salva.");
-  } else {
-    alert(j.error || "Erro ao salvar NF.");
-  }
-}
-
-async function deleteCut(id){
-  if(document.getElementById("adminPass").value !== ADMIN_PASS) return alert("Senha inválida.");
-  if(!confirm("Excluir este corte e remover da planilha?")) return;
-  const j = await api({ action: "deleteRow", id: id });
-  if(j.success){
-    await refreshData();
-    alert("Corte excluído.");
-  } else {
-    alert(j.error || "Erro ao excluir.");
-  }
-}
-
-async function uploadProof(id){
-  if(document.getElementById("adminPass").value !== ADMIN_PASS) return alert("Senha inválida.");
-  const fileInput = document.getElementById("file_" + id);
-  const file = fileInput.files[0];
-  if(!file) return alert("Selecione um arquivo ou imagem.");
-
-  const reader = new FileReader();
-  reader.onload = async function(e){
-    const payload = {
-      action: "uploadProof",
-      id: id,
-      filename: file.name,
-      mimeType: file.type,
-      bytes: Array.from(new Int8Array(e.target.result))
-    };
-    const j = await api({
-      action: "uploadProof",
-      id: id,
-      filename: file.name,
-      mimeType: file.type,
-      bytes: btoa(String.fromCharCode(...new Uint8Array(e.target.result)))
-    });
-    if(j.success){
-      await refreshData();
-      alert("Comprovante enviado.");
-    } else {
-      alert(j.error || "Erro ao enviar comprovante.");
-    }
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-function downloadMonth(){
-  const d = filteredRows();
-  const header = ["Id","Data","Tipo de Corte","Preço","Status","Data Pagamento","Nota Fiscal","Observações","Comprovante"];
-  const csv = [
-    header.join(","),
-    ...d.map(r => [
-      r["Id"],
-      r["Data"],
-      `"${String(r["Tipo de Corte"] || "").replace(/"/g,'""')}"`,
-      r["Preço"],
-      r["Status"],
-      r["Data Pagamento"] || "",
-      r["Nota Fiscal"] || "",
-      `"${String(r["Observações"] || "").replace(/"/g,'""')}"`,
-      r["Comprovante"] || r["Link Comprovante"] || ""
-    ].join(","))
-  ].join("\\n");
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `cortes_${currentMonth === "ALL" ? "todos" : currentMonth}.csv`;
-  a.click();
-}
-
-if(localStorage.getItem("cc_login") === "1"){
-  document.getElementById("loginView").classList.add("hidden");
-  document.getElementById("appView").classList.remove("hidden");
-  loadCutOptions();
-  setDefaultDate();
-  refreshData();
-} else {
-  loadCutOptions();
-  setDefaultDate();
-}
+const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzhx1ngfOs8eopPRpedYHFE7A8EO4t4nn7rCfBiOdXFxrZz80WY3qH2mf3XSBrR1a_t/exec";
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRo-CLB0__unjyN2Wq6t9r9vq5Fknj3vxXbws-ErK0suF3QtMbRlRgK02McDW2gBIwJlRqpPnxA9QV4/pub?output=csv";
+const LOGIN_PASS="Matheus123"; const ADD_PASS="Matheus-123$"; const PAY_PASS="Matheus-123$"; const HUGO_WA="5531971325441";
+let allCuts=[],currentFilter='all',currentMonth=new Date().getMonth(),currentYear=new Date().getFullYear(),addPassVerified=false,pixComprovantes={};
+const MONTHS=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const $=id=>document.getElementById(id);
+function safeStorageGet(k){try{return sessionStorage.getItem(k)}catch(e){return null}} function safeStorageSet(k,v){try{sessionStorage.setItem(k,v)}catch(e){}} function safeStorageRemove(k){try{sessionStorage.removeItem(k)}catch(e){}}
+function showDashboard(){ $('loginScreen').classList.remove('active'); $('dashScreen').classList.add('active'); $('loginError').textContent=''; $('loginPass').value=''; loadData(); }
+function showLogin(){ $('dashScreen').classList.remove('active'); $('loginScreen').classList.add('active'); }
+function tryLogin(){ const pass=($('loginPass').value||'').trim(); if(pass===LOGIN_PASS){ safeStorageSet('bc_auth','1'); showDashboard(); } else { $('loginError').textContent='Senha incorreta'; $('loginPass').value=''; } }
+window.tryLogin=tryLogin;
+document.addEventListener('DOMContentLoaded',()=>{ $('loginBtn').addEventListener('click',tryLogin); $('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); tryLogin(); } }); if(safeStorageGet('bc_auth')==='1'){ showDashboard(); } else { showLogin(); } });
+function logout(){ safeStorageRemove('bc_auth'); showLogin(); }
+async function loadData(){ const list=$('cutsList'); if(list) list.innerHTML='<div class="empty-state"><p>Carregando...</p></div>'; try{ let data; try{ data=await loadFromAppsScript(); }catch(e){ data=await loadFromCSV(); } allCuts=data; updateMonthLabel(); renderStats(); renderPendingList(); renderList(); }catch(err){ console.error(err); if(list) list.innerHTML='<div class="empty-state"><p>Erro ao carregar dados.</p></div>'; }}
+async function loadFromAppsScript(){ const res=await fetch(`${APPS_SCRIPT_URL}?action=read`); const json=await res.json(); if(json.success) return json.data.map(normalizeRow); throw new Error(json.error||'Erro Apps Script'); }
+async function loadFromCSV(){ const res=await fetch(CSV_URL); const text=await res.text(); const lines=text.split('\n').filter(l=>l.trim()); if(lines.length<2) return []; const headers=parseCSVLine(lines[0]); return lines.slice(1).map(line=>{ const vals=parseCSVLine(line); const row={}; headers.forEach((h,i)=>row[h.trim()]=(vals[i]||'').trim()); return normalizeRow(row); }); }
+function parseCSVLine(line){ const result=[]; let current='',inQuotes=false; for(let i=0;i<line.length;i++){ const ch=line[i]; if(ch==='"'){ inQuotes=!inQuotes; } else if(ch===','&&!inQuotes){ result.push(current); current=''; } else { current+=ch; } } result.push(current); return result; }
+function normalizeRow(row){ return {id:row['Id']||row['id']||'',data:row['Data']||row['data']||'',tipoCorte:row['Tipo de Corte']||row['tipo de corte']||row['Tipo De Corte']||'',preco:row['Preço']||row['Preco']||row['preco']||row['preço']||'',status:row['Status']||row['status']||'',dataPagamento:row['Data Pagamento']||row['data pagamento']||'',notaFiscal:row['Nota Fiscal']||row['nota fiscal']||'',observacoes:row['Observações']||row['Observacoes']||row['observações']||row['observacoes']||''}; }
+function updateMonthLabel(){ $('monthLabel').textContent=`${MONTHS[currentMonth]} ${currentYear}`; }
+function changeMonth(dir){ currentMonth+=dir; if(currentMonth>11){currentMonth=0;currentYear++;} if(currentMonth<0){currentMonth=11;currentYear--;} updateMonthLabel(); renderStats(); renderPendingList(); renderList(); }
+function parseDate(str){ if(!str) return null; str=String(str).trim(); if(/^\d{2}\/\d{2}\/\d{4}$/.test(str)){ const [d,m,y]=str.split('/'); return new Date(y,m-1,d);} if(/^\d{4}-\d{2}-\d{2}/.test(str)){ const [y,m,d]=str.split(/[-T]/); return new Date(y,m-1,d);} const d=new Date(str); return isNaN(d.getTime())?null:d; }
+function formatDate(str){ const d=parseDate(str); return d?d.toLocaleDateString('pt-BR'):str; }
+function parsePrice(val){ if(!val&&val!==0) return 0; const n=typeof val==='string'?parseFloat(val.replace(',', '.').replace(/[^\d.]/g,'')):val; return isNaN(n)?0:n; }
+function formatPrice(val){ const n=parsePrice(val); return 'R$ '+n.toFixed(2).replace('.', ','); }
+function getMonthCuts(){ return allCuts.filter(c=>{ const d=parseDate(c.data); return d&&d.getMonth()===currentMonth&&d.getFullYear()===currentYear; }); }
+function isPaid(c){ const s=(c.status||'').toLowerCase().trim(); return s==='pago'||s==='paid'; }
+function renderStats(){ const cuts=getMonthCuts(), paid=cuts.filter(isPaid), pending=cuts.filter(c=>!isPaid(c)), totalVal=cuts.reduce((s,c)=>s+parsePrice(c.preco),0), pendVal=pending.reduce((s,c)=>s+parsePrice(c.preco),0); $('statTotal').textContent=cuts.length; $('statGasto').textContent=formatPrice(totalVal); $('statPagos').textContent=paid.length; $('statPend').textContent=pending.length; $('statPendVal').style.display=pendVal>0?'inline-flex':'none'; $('statPendText').textContent=pendVal>0?formatPrice(pendVal):''; }
+function toggleMenu(id){ $(id).classList.toggle('open'); $(id+'Arrow').classList.toggle('open'); }
+function renderPendingList(){ const el=$('pendingPayList'); const pendingCuts=getMonthCuts().filter(c=>!isPaid(c)); if(!pendingCuts.length){ el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:.85rem">✅ Nenhum pendente neste mês</div>'; return; } el.innerHTML=pendingCuts.map(c=>`<div class="pending-item"><div><div class="pending-tipo">${esc(c.tipoCorte)||'—'}</div><div class="pending-data">${formatDate(c.data)}</div></div><div style="display:flex;align-items:center;gap:6px"><div class="pending-item-price">${formatPrice(c.preco)}</div><button class="pending-pay-btn" onclick="openPayModal(${esc(c.id)})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></button></div></div>`).join(''); }
+function setFilter(f,btn){ currentFilter=f; document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); btn.classList.add('active'); renderList(); }
+function renderList(){ let cuts=getMonthCuts(); if(currentFilter==='pending') cuts=cuts.filter(c=>!isPaid(c)); if(currentFilter==='paid') cuts=cuts.filter(c=>isPaid(c)); cuts.sort((a,b)=>(parseDate(b.data)||new Date(0))-(parseDate(a.data)||new Date(0))); const list=$('cutsList'); if(!cuts.length){ list.innerHTML='<div class="empty-state"><p>Nenhum corte neste mês</p></div>'; return; } list.innerHTML=cuts.map(c=>{ const paid=isPaid(c), hasPix=!!pixComprovantes[c.id]; return `<div class="cut-card ${paid?'paid':'pending'}" onclick="openDetail(${esc(c.id)})"><div class="cut-top"><div><div class="cut-type">${esc(c.tipoCorte)||'—'}</div><div class="cut-date">${formatDate(c.data)}</div></div><span class="cut-status ${paid?'paid':'pending'}">${paid?'Pago':'Pendente'}</span></div><div class="cut-bottom"><div class="cut-price">${formatPrice(c.preco)}</div><div class="cut-actions">${!paid?`<button class="cut-action-btn pay" onclick="event.stopPropagation();openPayModal(${esc(c.id)})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></button>`:''}<button class="cut-action-btn invoice" onclick="event.stopPropagation();openInvoiceModal(${esc(c.id)})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></button><button class="cut-action-btn pix" onclick="event.stopPropagation();openPixModal(${esc(c.id)})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></button></div></div><div class="cut-tags">${c.notaFiscal?`<div class="cut-invoice-tag">📄 NF: ${esc(c.notaFiscal)}</div>`:''}${hasPix?`<div class="cut-pix-tag" onclick="event.stopPropagation();viewPix(${esc(c.id)})">💜 Ver comprovante</div>`:''}</div>${c.observacoes?`<div class="cut-obs">${esc(c.observacoes)}</div>`:''}</div>`; }).join(''); }
+function autoFillPrice(){ const sel=$('fTipo'); const opt=sel.options[sel.selectedIndex]; const price=opt?opt.getAttribute('data-price'):null; if(price) $('fPreco').value=price.replace('.', ','); }
+function openAddModal(){ addPassVerified=false; $('addPassGate').style.display='block'; $('addForm').style.display='none'; $('addPass').value=''; $('fData').value=new Date().toISOString().split('T')[0]; $('fTipo').value=''; $('fPreco').value=''; $('fObs').value=''; $('fJaPago').checked=false; openModal('addModal'); }
+function checkAddPass(){ if($('addPass').value===ADD_PASS){ addPassVerified=true; $('addPassGate').style.display='none'; $('addForm').style.display='block'; } else showToast('Senha incorreta','error'); }
+async function submitCut(){ if(!addPassVerified) return; const tipo=$('fTipo').value.trim(), preco=$('fPreco').value.trim(), data=$('fData').value, jaPago=$('fJaPago').checked; if(!tipo||!preco||!data){ showToast('Preencha os campos obrigatórios','error'); return; } const [y,m,d]=data.split('-'), dataFormatted=`${d}/${m}/${y}`, status=jaPago?'Pago':'Pendente', dataPagamento=jaPago?dataFormatted:''; const btn=$('addSubmitBtn'); btn.disabled=true; btn.textContent='Adicionando...'; try{ const url=`${APPS_SCRIPT_URL}?action=add&data=${enc(dataFormatted)}&tipoCorte=${enc(tipo)}&preco=${enc(preco)}&status=${enc(status)}&dataPagamento=${enc(dataPagamento)}&observacoes=${enc($('fObs').value.trim())}`; const res=await fetch(url); const json=await res.json(); if(!json.success) throw new Error(json.error); showToast('Corte adicionado!','success'); closeModal('addModal'); await loadData(); }catch(err){ console.error(err); showToast('Erro ao adicionar','error'); } btn.disabled=false; btn.textContent='Adicionar Corte'; }
+function openDetail(id){ const cut=allCuts.find(c=>String(c.id)===String(id)); if(!cut) return; const paid=isPaid(cut), hasPix=!!pixComprovantes[cut.id]; $('detailTitle').textContent=`✂️ Corte #${cut.id}`; $('detailContent').innerHTML=`<div class="detail-field"><div class="detail-label">Tipo de Corte</div><div class="detail-value">${esc(cut.tipoCorte)||'—'}</div></div><div class="detail-field"><div class="detail-label">Data</div><div class="detail-value">${formatDate(cut.data)}</div></div><div class="detail-field"><div class="detail-label">Preço</div><div class="detail-value" style="color:var(--gold)">${formatPrice(cut.preco)}</div></div><div class="detail-field"><div class="detail-label">Status</div><div class="detail-value"><span class="cut-status ${paid?'paid':'pending'}">${paid?'Pago':'Pendente'}</span></div></div>${cut.dataPagamento?`<div class="detail-field"><div class="detail-label">Data Pagamento</div><div class="detail-value">${formatDate(cut.dataPagamento)}</div></div>`:''}${cut.notaFiscal?`<div class="detail-field"><div class="detail-label">Nota Fiscal</div><div class="detail-value">${esc(cut.notaFiscal)}</div></div>`:''}${cut.observacoes?`<div class="detail-field"><div class="detail-label">Observações</div><div class="detail-value">${esc(cut.observacoes)}</div></div>`:''}<div class="detail-actions">${!paid?`<button class="detail-btn pay" onclick="closeModal('detailModal');openPayModal(${cut.id})">Confirmar Pagamento</button>`:''}<button class="detail-btn invoice" onclick="closeModal('detailModal');openInvoiceModal(${cut.id})">${cut.notaFiscal?'Editar':'Adicionar'} Nota Fiscal</button><button class="detail-btn pix" onclick="closeModal('detailModal');openPixModal(${cut.id})">${hasPix?'Ver / Trocar':'Anexar'} Comprovante Pix</button><button class="detail-btn delete" onclick="closeModal('detailModal');deleteCut(${cut.id})">Excluir Corte</button></div><button class="form-cancel" style="margin-top:10px" onclick="closeModal('detailModal')">Fechar</button>`; openModal('detailModal'); }
+function openPayModal(id){ const cut=allCuts.find(c=>String(c.id)===String(id)); if(!cut) return; const today=new Date().toISOString().split('T')[0]; $('payContent').innerHTML=`<p style="color:var(--text2);margin-bottom:20px;font-size:.9rem">Confirmar pagamento do corte <strong style="color:var(--text)">${esc(cut.tipoCorte)}</strong> — <strong style="color:var(--gold)">${formatPrice(cut.preco)}</strong></p><div class="form-group"><label class="form-label">Data do pagamento</label><input type="date" class="form-input" id="payDate" value="${today}"></div><div class="form-group"><label class="form-label">Senha de confirmação</label><input type="password" class="form-input" id="payPassInput" placeholder="Digite a senha"></div><button class="form-submit" onclick="confirmPay(${cut.id})">✅ Confirmar Pagamento</button><button class="form-cancel" onclick="closeModal('payModal')">Cancelar</button>`; openModal('payModal'); }
+async function confirmPay(id){ if(($('payPassInput').value||'')!==PAY_PASS){ showToast('Senha incorreta','error'); return; } const payDate=$('payDate').value; const [y,m,d]=payDate.split('-'); const formatted=`${d}/${m}/${y}`; try{ const url=`${APPS_SCRIPT_URL}?action=updatePayment&id=${id}&dataPagamento=${enc(formatted)}`; const res=await fetch(url); const json=await res.json(); if(!json.success) throw new Error(json.error); showToast('Pagamento confirmado!','success'); closeModal('payModal'); await loadData(); }catch(err){ console.error(err); showToast('Erro ao confirmar pagamento','error'); } }
+function openInvoiceModal(id){ const cut=allCuts.find(c=>String(c.id)===String(id)); if(!cut) return; $('invoiceContent').innerHTML=`<p style="color:var(--text2);margin-bottom:20px;font-size:.9rem">Nota fiscal do corte <strong style="color:var(--text)">${esc(cut.tipoCorte)}</strong></p><div class="form-group"><label class="form-label">Número / Código da Nota Fiscal</label><input type="text" class="form-input" id="nfInput" value="${esc(cut.notaFiscal)}" placeholder="Ex: NF-001234"></div><button class="form-submit" onclick="saveInvoice(${cut.id})">💾 Salvar Nota Fiscal</button><button class="form-cancel" onclick="closeModal('invoiceModal')">Cancelar</button>`; openModal('invoiceModal'); }
+async function saveInvoice(id){ try{ const nf=$('nfInput').value.trim(); const url=`${APPS_SCRIPT_URL}?action=updateInvoice&id=${id}&notaFiscal=${enc(nf)}`; const res=await fetch(url); const json=await res.json(); if(!json.success) throw new Error(json.error); showToast('Nota fiscal salva!','success'); closeModal('invoiceModal'); await loadData(); }catch(err){ console.error(err); showToast('Erro ao salvar nota fiscal','error'); } }
+function openPixModal(id){ const cut=allCuts.find(c=>String(c.id)===String(id)); if(!cut) return; const hasPix=!!pixComprovantes[id]; $('pixContent').innerHTML=`<p style="color:var(--text2);margin-bottom:16px;font-size:.9rem">Comprovante Pix do corte <strong style="color:var(--text)">${esc(cut.tipoCorte)}</strong> — <strong style="color:var(--gold)">${formatPrice(cut.preco)}</strong></p>${hasPix?`<img src="${pixComprovantes[id]}" class="pix-img-preview" alt="Comprovante Pix">`:`<div class="pix-placeholder">📎 Nenhum comprovante anexado ainda</div>`}<div class="form-group" style="margin-top:16px"><label class="form-label">Selecionar imagem do comprovante</label><input type="file" accept="image/*" class="form-input" id="pixFileInput" style="padding:10px" onchange="previewPix(${id})"></div><button class="form-submit" onclick="savePix(${id})">💾 Salvar Comprovante</button>${hasPix?`<button class="form-cancel" onclick="closeModal('pixModal');viewPix(${id})">Ver comprovante</button>`:''}<button class="form-cancel" onclick="closeModal('pixModal')">Cancelar</button>`; openModal('pixModal'); }
+function previewPix(id){ const file=$('pixFileInput').files[0]; if(!file) return; const reader=new FileReader(); reader.onload=e=>{ const existing=document.querySelector('#pixContent .pix-img-preview, #pixContent .pix-placeholder'); if(existing){ const img=document.createElement('img'); img.src=e.target.result; img.className='pix-img-preview'; existing.replaceWith(img); } }; reader.readAsDataURL(file); }
+function savePix(id){ const file=$('pixFileInput').files[0]; if(!file){ showToast('Selecione uma imagem primeiro','error'); return; } const reader=new FileReader(); reader.onload=e=>{ pixComprovantes[id]=e.target.result; showToast('Comprovante salvo!','success'); closeModal('pixModal'); renderList(); }; reader.readAsDataURL(file); }
+function viewPix(id){ const src=pixComprovantes[id]; if(!src){ showToast('Nenhum comprovante anexado','error'); return; } $('pixViewContent').innerHTML=`<img src="${src}" style="width:100%;border-radius:var(--radius-sm);margin-bottom:16px" alt="Comprovante Pix"><button class="form-cancel" onclick="closeModal('pixViewModal')">Fechar</button>`; openModal('pixViewModal'); }
+function openShareWA(){ const cuts=getMonthCuts(), paid=cuts.filter(isPaid), pending=cuts.filter(c=>!isPaid(c)); const totalVal=cuts.reduce((s,c)=>s+parsePrice(c.preco),0), paidVal=paid.reduce((s,c)=>s+parsePrice(c.preco),0), pendVal=pending.reduce((s,c)=>s+parsePrice(c.preco),0); const resumo=[`✂️ *RESUMO DE CORTES — ${MONTHS[currentMonth].toUpperCase()} ${currentYear}*`,'',`📊 Total de cortes: ${cuts.length}`,`💰 Total gasto: ${formatPrice(totalVal)}`,`✅ Pagos: ${paid.length} (${formatPrice(paidVal)})`,`⏳ Pendentes: ${pending.length} (${formatPrice(pendVal)})`,'',pending.length?`*Pendentes:*\n${pending.map(c=>`• ${c.tipoCorte} - ${formatPrice(c.preco)} (${formatDate(c.data)})`).join('\n')}`:'✅ Tudo pago esse mês!','','_Enviado via Controle de Corte v3.0_'].join('\n'); window.open(`https://wa.me/${HUGO_WA}?text=${encodeURIComponent(resumo)}`,'_blank'); }
+function openWAHugo(){ window.open(`https://wa.me/${HUGO_WA}`,'_blank'); }
+function deleteCut(id){ const cut=allCuts.find(c=>String(c.id)===String(id)); if(!cut) return; $('confirmTitle').textContent='Excluir corte?'; $('confirmText').textContent=`Tem certeza que deseja excluir o corte ${cut.tipoCorte||''}? Essa ação não pode ser desfeita.`; $('confirmDialog').classList.add('open'); $('confirmYes').className='confirm-yes danger'; $('confirmYes').onclick=async()=>{ try{ const res=await fetch(`${APPS_SCRIPT_URL}?action=deleteRow&id=${id}`); const json=await res.json(); if(!json.success) throw new Error(json.error||'Erro ao excluir'); $('confirmDialog').classList.remove('open'); showToast('Corte excluído com sucesso!','success'); await loadData(); }catch(err){ console.error(err); showToast('Erro ao excluir corte','error'); } }; }
+function openModal(id){ $(id).classList.add('open'); document.body.style.overflow='hidden'; } function closeModal(id){ $(id).classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{ if(e.target===el) closeModal(el.id); }));
+function showToast(msg,type='success'){ const t=$('toast'); t.textContent=msg; t.className='toast '+type+' show'; clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.remove('show'),2800); }
+function closeConfirm(){ $('confirmDialog').classList.remove('open'); }
+function esc(str){ if(str===null||str===undefined) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function enc(str){ return encodeURIComponent(str); }
 </script>
 </body>
 </html>
