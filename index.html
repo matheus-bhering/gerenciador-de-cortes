@@ -1,396 +1,607 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Controle de Corte</title>
-<meta name="description" content="Gerencie seus cortes de cabelo, pagamentos e comprovantes." />
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#1a1612; --bg2:#100d0a; --card:#26211c; --card2:#2f2924;
-    --text:#f3ecdf; --muted:#a89f90; --gold:#d4a84a; --gold2:#b78a2e;
-    --border:rgba(212,168,74,.25); --danger:#e0533a; --green:#3fb27f;
-  }
-  html,body{background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-  .font-display{font-family:"Bebas Neue",sans-serif;letter-spacing:.04em}
-  .text-gold{color:var(--gold)}
-  .bg-card{background:var(--card)}
-  .bg-card2{background:var(--card2)}
-  .border-gold{border-color:var(--border)}
-  .gold-btn{background:linear-gradient(135deg,#e6bf63,#b78a2e);color:#1a1612;font-weight:700;border:none;cursor:pointer}
-  .gold-btn:hover{filter:brightness(1.08)}
-  .ghost-btn{background:transparent;border:1px solid var(--border);color:var(--text);cursor:pointer}
-  .ghost-btn:hover{background:rgba(212,168,74,.08)}
-  .danger-btn{background:var(--danger);color:#fff;border:none;cursor:pointer}
-  input,select,textarea{background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:.5rem;padding:.55rem .75rem;width:100%;outline:none}
-  input:focus,select:focus,textarea:focus{border-color:var(--gold)}
-  label{font-size:.8rem;color:var(--muted);display:block;margin-bottom:.25rem}
-  .chip{display:inline-block;padding:.2rem .55rem;border-radius:999px;font-size:.72rem;font-weight:600}
-  .chip-paid{background:rgba(63,178,127,.15);color:#7fdcab;border:1px solid rgba(63,178,127,.35)}
-  .chip-pend{background:rgba(224,83,58,.15);color:#f0a698;border:1px solid rgba(224,83,58,.35)}
-  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:50;padding:1rem}
-  .modal{background:var(--card);border:1px solid var(--border);border-radius:1rem;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:1.25rem}
-  .kpi{background:var(--card);border:1px solid var(--border);border-radius:.85rem;padding:.9rem}
-  .row{background:var(--card);border:1px solid var(--border);border-radius:.85rem;padding:.85rem;margin-bottom:.6rem}
-  .spinner{width:18px;height:18px;border:2px solid rgba(212,168,74,.3);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);padding:.75rem 1.1rem;border-radius:.6rem;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:90vw}
-  .toast.err{border-color:var(--danger);color:#f0a698}
-  .toast.ok{border-color:var(--green);color:#7fdcab}
-  details summary{cursor:pointer;list-style:none}
-  details summary::-webkit-details-marker{display:none}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CONTROLE DE CORTE</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#111827;
+      --panel2:#0f172a;
+      --line:#223047;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --blue:#2563eb;
+      --green:#16a34a;
+      --red:#dc2626;
+      --amber:#d97706;
+      --chip:#1f2937;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#08111f,#0b1220 35%,#0b1220);
+      color:var(--text);
+    }
+    .wrap{max-width:1300px;margin:0 auto;padding:20px}
+    .card{
+      background:rgba(17,24,39,.96);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      margin:14px 0;
+      box-shadow:0 12px 30px rgba(0,0,0,.22);
+    }
+    .title{font-size:30px;font-weight:800;letter-spacing:.5px;margin:0}
+    .muted{color:var(--muted)}
+    .topbar,.row,.grid{display:grid;gap:12px}
+    .topbar{grid-template-columns:repeat(5,1fr)}
+    .row{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+    .grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+    input,select,textarea,button{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid #334155;
+      background:#0b1220;
+      color:var(--text);
+      outline:none;
+    }
+    textarea{min-height:96px;resize:vertical}
+    button{
+      cursor:pointer;
+      border:none;
+      font-weight:700;
+      transition:.15s transform ease, .15s opacity ease;
+    }
+    button:hover{transform:translateY(-1px);opacity:.95}
+    .btn-blue{background:var(--blue)}
+    .btn-green{background:var(--green)}
+    .btn-red{background:var(--red)}
+    .btn-amber{background:var(--amber)}
+    .btn-dark{background:#334155}
+    .kpi{
+      background:var(--panel2);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
+    .kpi span{display:block;color:var(--muted);font-size:13px}
+    .kpi b{display:block;font-size:28px;margin-top:8px}
+    .tableWrap{overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:1100px}
+    th,td{
+      padding:10px 8px;
+      border-bottom:1px solid #233247;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+    th{color:#cbd5e1}
+    .badge{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:var(--chip);
+      border:1px solid #334155;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .hidden{display:none}
+    .split{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .split > *{flex:1}
+    .sectionHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .small{font-size:12px}
+    .actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+    .footer{
+      text-align:center;
+      padding:18px 0 6px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .loginBox{
+      max-width:520px;
+      margin:50px auto;
+    }
+    .note{
+      border-left:3px solid #3b82f6;
+      padding-left:10px;
+      color:#cbd5e1;
+      margin:8px 0 0;
+    }
+    .dangerText{color:#fca5a5}
+  </style>
 </head>
 <body>
-<div id="app"></div>
-<div id="modal-root"></div>
-<div id="toast-root"></div>
+  <div class="wrap">
+    <div class="card">
+      <div class="sectionHead">
+        <div>
+          <h1 class="title">CONTROLE DE CORTE</h1>
+          <div class="muted">Criado por: Matheus Bhering</div>
+        </div>
+        <div class="split" style="min-width:min(100%,520px)">
+          <button class="btn-blue" onclick="refreshData()">Refresh</button>
+          <button class="btn-dark" onclick="logout()">Sair do site</button>
+          <button class="btn-dark" onclick="sendSummaryWhatsApp()">Enviar resumo no WhatsApp</button>
+          <button class="btn-dark" onclick="openHugoWhatsApp()">Conversar com Hugo</button>
+          <button class="btn-dark" onclick="downloadMonth()">Baixar mês</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="loginView" class="card loginBox">
+      <h2>Login</h2>
+      <div class="row">
+        <input id="loginPass" type="password" placeholder="Senha de login" />
+        <button class="btn-blue" onclick="doLogin()">Entrar</button>
+      </div>
+      <p class="note small">A página de login não exibe nome adicional além do app.</p>
+    </div>
+
+    <div id="appView" class="hidden">
+      <div class="card">
+        <div class="row">
+          <select id="monthFilter" onchange="renderAll()"></select>
+          <select id="historyFilter" onchange="renderHistory()">
+            <option value="ALL">HISTÓRICO: TODOS</option>
+            <option value="Pendente">HISTÓRICO: PENDENTES</option>
+            <option value="Pago">HISTÓRICO: PAGOS</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid" id="dashboard"></div>
+
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Pendentes de pagamento</h2>
+          <span class="badge" id="pendingCount">0</span>
+        </div>
+        <div id="pendingList"></div>
+      </div>
+
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Lançar corte</h2>
+          <span class="badge">Senha necessária</span>
+        </div>
+        <div class="row">
+          <input id="adminPass" type="password" placeholder="Senha para lançar / pagar / excluir" />
+          <button class="btn-amber" onclick="unlockActionArea()">Validar senha</button>
+        </div>
+
+        <div id="actionArea" class="hidden" style="margin-top:12px">
+          <div class="row">
+            <select id="cutType"></select>
+            <input id="cutDate" type="date" />
+            <input id="cutObs" type="text" placeholder="Observações" />
+            <label class="badge" style="display:flex;align-items:center;gap:8px;justify-content:center;">
+              <input id="cutPaidNow" type="checkbox" style="width:auto" />
+              Adicionar como já pago
+            </label>
+            <button class="btn-green" onclick="addCut()">Salvar corte</button>
+          </div>
+          <p class="note small">Após adicionar, você pode confirmar pagamento, inserir NF ou enviar comprovante direto no histórico.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Histórico de cortes</h2>
+          <span class="badge" id="historyCount">0</span>
+        </div>
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Data</th>
+                <th>Tipo de Corte</th>
+                <th>Preço</th>
+                <th>Status</th>
+                <th>Data Pagamento</th>
+                <th>Nota Fiscal</th>
+                <th>Observações</th>
+                <th>Comprovante</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">Criado por: Matheus Bhering</div>
+  </div>
 
 <script>
-/* ============== CONFIG ============== */
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhx1ngfOs8eopPRpedYHFE7A8EO4t4nn7rCfBiOdXFxrZz80WY3qH2mf3XSBrR1a_t/exec";
-const PASS_LOGIN = "Matheus123";
-const PASS_ACTION = "Matheus-123$";
+const APPS_SCRIPT_URL = "COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT";
+const HUGO_WA = "5531971325441";
+const LOGIN_PASS = "Matheus123";
+const ADMIN_PASS = "Matheus-123$";
 
-const HAIRCUT_TABLE = [
-  {name:"Nevou+corte",price:130},{name:"Luzes+corte",price:130},{name:"Barba",price:15},
-  {name:"Sobrancelha",price:7},{name:"Pezinho",price:7},{name:"Corte disfarçado",price:30},
-  {name:"Corte simples+barba",price:40},{name:"Corte disfarçado+barba",price:45},
-  {name:"Corte simples+barba+sobrancelha",price:47},{name:"Corte disfarçado+barba+sobrancelha",price:52},
-  {name:"Corte+pigmentação",price:45},{name:"Corte navalhado",price:35},
-  {name:"Corte+pigmentação+barba+sobrancelha",price:67},{name:"Corte+pigmentação+sobrancelha",price:52},
-  {name:"Corte disfarçado+sobrancelha",price:37},{name:"Corte navalhado+barba",price:50},
-  {name:"Corte disfarçado+barba+pigmentação",price:60},{name:"Corte Degrade",price:30},
-  {name:"Corte degrade+barba",price:45},{name:"Corte degrade+barba+sobrancelha",price:52},
+const CUTS = [
+  ["Nevou+corte",130],
+  ["Luzes+corte",130],
+  ["Barba",15],
+  ["Sobrancelha",7],
+  ["Pezinho",7],
+  ["Corte disfarçado",30],
+  ["Corte simples+barba",40],
+  ["Corte disfarçado+barba",45],
+  ["Corte simples+barba+sobrancelha",47],
+  ["Corte disfaçado+barba+sobrancelha",52],
+  ["Corte+pigmentação",45],
+  ["Corte navalhado",35],
+  ["Corte+pigmentação+barba +sobrancelha",67],
+  ["Corte+pigmentação+sobrancelha",52],
+  ["Corte disfarçado+sobrancelha",37],
+  ["Corte navalhado+barba",50],
+  ["Corte disfarçado +barba +pigmentação",60],
+  ["Corte Degrade",30],
+  ["Corte degrade +barba",45],
+  ["Corte degrade+barba+sobrancelha",52]
 ];
-const MONTHS_PT=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
-/* ============== HELPERS ============== */
-const $ = (s,r=document)=>r.querySelector(s);
-const fmtBR = d => `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${d.getFullYear()}`;
-const todayBR = ()=>fmtBR(new Date());
-function parseBR(s){if(!s)return null;const m=/^(\d{2})\/(\d{2})\/(\d{4})/.exec(String(s).trim());if(m)return new Date(+m[3],+m[2]-1,+m[1]);const d=new Date(s);return isNaN(d)?null:d;}
-function priceOf(c){const v=c["Preço"];if(typeof v==="number")return v;const n=parseFloat(String(v).replace(",","."));return isNaN(n)?0:n;}
-function isPaid(c){return String(c.Status||"").toLowerCase().startsWith("pag");}
-function brl(v){return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}
-function inMonth(c,y,m){const d=parseBR(c.Data);return d&&d.getFullYear()===y&&d.getMonth()===m;}
-function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+let rows = [];
+let currentMonth = "ALL";
 
-function toast(msg,type="ok"){
-  const el=document.createElement("div");
-  el.className=`toast ${type}`;el.textContent=msg;
-  $("#toast-root").appendChild(el);
-  setTimeout(()=>el.remove(),3500);
+function money(v){
+  const n = Number(v || 0);
+  return "R$ " + n.toFixed(2);
 }
 
-/* ============== API ============== */
-async function apiCall(params){
-  const url=new URL(APPS_SCRIPT_URL);
-  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));
-  url.searchParams.set("_t",Date.now());
-  const r=await fetch(url.toString(),{method:"GET",redirect:"follow"});
-  if(!r.ok)throw new Error("HTTP "+r.status);
+function dateMonthKey(v){
+  if(!v) return "";
+  const s = String(v).trim();
+  if (s.includes("-")) return s.slice(0,7);
+  const p = s.split("/");
+  if (p.length === 3) return `${p[2]}-${p[1]}`;
+  return "";
+}
+
+function dateBR(){
+  const d = new Date();
+  return d.toLocaleDateString("pt-BR");
+}
+
+function todayISO(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function qs(params){
+  const u = new URL(APPS_SCRIPT_URL);
+  Object.entries(params).forEach(([k,v]) => u.searchParams.set(k, v));
+  return u.toString();
+}
+
+async function api(params){
+  const r = await fetch(qs(params), { method: "GET" });
   return await r.json();
 }
-const api={
-  read:()=>apiCall({action:"read"}),
-  add:p=>apiCall({action:"add",data:p.data,tipoCorte:p.tipoCorte,preco:p.preco,status:p.status,dataPagamento:p.dataPagamento||"",notaFiscal:p.notaFiscal||"",observacoes:p.observacoes||""}),
-  updatePayment:(id,dp)=>apiCall({action:"updatePayment",id:String(id),dataPagamento:dp||""}),
-  updateInvoice:(id,nf)=>apiCall({action:"updateInvoice",id:String(id),notaFiscal:nf}),
-  deleteRow:id=>apiCall({action:"deleteRow",id:String(id)}),
-};
 
-/* ============== STATE ============== */
-const state={
-  authed:localStorage.getItem("cc_auth")==="1",
-  cuts:[],
-  loading:false,
-  year:new Date().getFullYear(),
-  month:new Date().getMonth(),
-  hugo:localStorage.getItem("cc_hugo")||"5531971325441",
-};
-
-/* ============== RENDER ============== */
-function render(){
-  if(!state.authed){renderLogin();return;}
-  renderDashboard();
+function openHugoWhatsApp(){
+  window.open(`https://wa.me/${HUGO_WA}`, "_blank");
 }
 
-function renderLogin(){
-  $("#app").innerHTML=`
-    <div class="min-h-screen flex items-center justify-center p-6">
-      <div class="bg-card border border-gold rounded-2xl p-8 max-w-sm w-full text-center" style="box-shadow:0 20px 60px rgba(0,0,0,.5)">
-        <div class="font-display text-5xl text-gold mb-1">CONTROLE</div>
-        <div class="font-display text-3xl mb-6">DE CORTE</div>
-        <p class="text-sm" style="color:var(--muted)">Acesso restrito</p>
-        <form id="login-form" class="mt-6 space-y-3 text-left">
-          <div><label>Senha</label><input type="password" id="pw" autofocus required/></div>
-          <button class="gold-btn w-full py-3 rounded-lg">Entrar</button>
-        </form>
-      </div>
-    </div>`;
-  $("#login-form").onsubmit=e=>{
-    e.preventDefault();
-    if($("#pw").value===PASS_LOGIN){
-      localStorage.setItem("cc_auth","1");state.authed=true;render();loadData();
-    } else toast("Senha incorreta","err");
-  };
+function sendSummaryWhatsApp(){
+  const d = filteredRows();
+  const total = d.reduce((s,r)=>s + Number(r["Preço"] || 0), 0);
+  const paid = d.filter(r=>String(r["Status"]).toLowerCase() === "pago");
+  const pending = d.filter(r=>String(r["Status"]).toLowerCase() !== "pago");
+
+  const text = [
+    "Resumo dos cortes",
+    `Mês: ${monthFilter.value === "ALL" ? "Todos" : monthFilter.value}`,
+    `Cortes no mês: ${d.length}`,
+    `Total gasto: ${money(total)}`,
+    `Pagos: ${paid.length}`,
+    `Pendentes: ${pending.length}`
+  ].join("\\n");
+
+  window.open(`https://wa.me/${HUGO_WA}?text=${encodeURIComponent(text)}`, "_blank");
 }
 
-async function loadData(){
-  state.loading=true;render();
-  try{
-    const r=await api.read();
-    state.cuts=Array.isArray(r.data)?r.data:[];
-  }catch(e){toast("Erro ao carregar: "+e.message,"err");}
-  state.loading=false;render();
+function logout(){
+  localStorage.removeItem("cc_login");
+  location.reload();
+}
+
+function doLogin(){
+  if(document.getElementById("loginPass").value === LOGIN_PASS){
+    localStorage.setItem("cc_login", "1");
+    document.getElementById("loginView").classList.add("hidden");
+    document.getElementById("appView").classList.remove("hidden");
+    loadCutOptions();
+    setDefaultDate();
+    refreshData();
+  } else {
+    alert("Senha incorreta.");
+  }
+}
+
+function unlockActionArea(){
+  if(document.getElementById("adminPass").value === ADMIN_PASS){
+    document.getElementById("actionArea").classList.remove("hidden");
+  } else {
+    alert("Senha incorreta.");
+  }
+}
+
+function loadCutOptions(){
+  const el = document.getElementById("cutType");
+  el.innerHTML = CUTS.map(c => `<option value="${c[0]}|${c[1]}">${c[0]} - ${money(c[1])}</option>`).join("");
+}
+
+function setDefaultDate(){
+  document.getElementById("cutDate").value = todayISO();
+}
+
+function normalizeMonthOptions(){
+  const months = [...new Set(rows.map(r => dateMonthKey(r["Data"])).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
+  const select = document.getElementById("monthFilter");
+  select.innerHTML = `<option value="ALL">Todos os meses</option>` + months.map(m => `<option value="${m}">${m}</option>`).join("");
+}
+
+function filteredRows(){
+  if(currentMonth === "ALL") return rows;
+  return rows.filter(r => dateMonthKey(r["Data"]) === currentMonth);
 }
 
 function renderDashboard(){
-  const filtered=state.cuts.filter(c=>inMonth(c,state.year,state.month));
-  const total=filtered.reduce((s,c)=>s+priceOf(c),0);
-  const paid=filtered.filter(isPaid).reduce((s,c)=>s+priceOf(c),0);
-  const pending=total-paid;
-  const years=[...new Set(state.cuts.map(c=>{const d=parseBR(c.Data);return d?d.getFullYear():null;}).filter(Boolean))];
-  if(!years.includes(state.year))years.push(state.year);
-  years.sort((a,b)=>b-a);
+  const d = filteredRows();
+  const total = d.reduce((s,r)=>s + Number(r["Preço"] || 0), 0);
+  const paid = d.filter(r => String(r["Status"]).toLowerCase() === "pago");
+  const pending = d.filter(r => String(r["Status"]).toLowerCase() !== "pago");
+  const paidTotal = paid.reduce((s,r)=>s + Number(r["Preço"] || 0), 0);
 
-  $("#app").innerHTML=`
-    <div class="max-w-3xl mx-auto p-4 pb-24">
-      <header class="flex items-center justify-between mb-5">
-        <div>
-          <div class="font-display text-3xl text-gold leading-none">CONTROLE</div>
-          <div class="font-display text-xl leading-none">DE CORTE</div>
-        </div>
-        <div class="flex gap-2">
-          <button id="btn-refresh" class="ghost-btn px-3 py-2 rounded-lg" title="Atualizar">↻</button>
-          <button id="btn-settings" class="ghost-btn px-3 py-2 rounded-lg" title="Config">⚙</button>
-          <button id="btn-logout" class="ghost-btn px-3 py-2 rounded-lg" title="Sair">⎋</button>
-        </div>
-      </header>
-
-      <div class="grid grid-cols-2 gap-2 mb-4">
-        <select id="sel-month">${MONTHS_PT.map((m,i)=>`<option value="${i}" ${i===state.month?"selected":""}>${m}</option>`).join("")}</select>
-        <select id="sel-year">${years.map(y=>`<option value="${y}" ${y===state.year?"selected":""}>${y}</option>`).join("")}</select>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2 mb-4">
-        <div class="kpi"><div class="text-xs" style="color:var(--muted)">Cortes no mês</div><div class="font-display text-3xl text-gold">${filtered.length}</div></div>
-        <div class="kpi"><div class="text-xs" style="color:var(--muted)">Total</div><div class="font-display text-2xl">${brl(total)}</div></div>
-        <div class="kpi"><div class="text-xs" style="color:var(--muted)">Pago</div><div class="font-display text-2xl" style="color:var(--green)">${brl(paid)}</div></div>
-        <div class="kpi"><div class="text-xs" style="color:var(--muted)">Pendente</div><div class="font-display text-2xl" style="color:var(--danger)">${brl(pending)}</div></div>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2 mb-5">
-        <button id="btn-add" class="gold-btn py-3 rounded-lg col-span-3">+ Novo corte</button>
-        <button id="btn-wpp-resumo" class="ghost-btn py-2 rounded-lg text-sm">📤 Resumo</button>
-        <button id="btn-wpp" class="ghost-btn py-2 rounded-lg text-sm">💬 Hugo</button>
-        <button id="btn-invoice" class="ghost-btn py-2 rounded-lg text-sm">🧾 Nota</button>
-      </div>
-
-      <h2 class="font-display text-xl text-gold mb-2">Cortes — ${MONTHS_PT[state.month]} ${state.year}</h2>
-      <div id="list">
-        ${state.loading?'<div class="text-center py-8"><span class="spinner"></span> Carregando...</div>':
-          filtered.length===0?`<div class="text-center py-8" style="color:var(--muted)">Sem cortes neste mês.</div>`:
-          filtered.sort((a,b)=>(parseBR(b.Data)||0)-(parseBR(a.Data)||0)).map(rowHtml).join("")}
-      </div>
-    </div>`;
-
-  $("#btn-refresh").onclick=loadData;
-  $("#btn-logout").onclick=()=>{localStorage.removeItem("cc_auth");state.authed=false;render();};
-  $("#btn-settings").onclick=openSettings;
-  $("#sel-month").onchange=e=>{state.month=+e.target.value;render();};
-  $("#sel-year").onchange=e=>{state.year=+e.target.value;render();};
-  $("#btn-add").onclick=()=>askPassword(openAddDialog);
-  $("#btn-wpp-resumo").onclick=sendResumoWpp;
-  $("#btn-wpp").onclick=()=>{
-    if(!state.hugo){toast("Configure o WhatsApp do Hugo em ⚙","err");return;}
-    window.open(`https://wa.me/${state.hugo}`,"_blank");
-  };
-  $("#btn-invoice").onclick=openInvoice;
-  document.querySelectorAll("[data-pay]").forEach(b=>b.onclick=()=>askPassword(()=>markPaid(+b.dataset.pay)));
-  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>askPassword(()=>delCut(+b.dataset.del)));
-  document.querySelectorAll("[data-nf]").forEach(b=>b.onclick=()=>openNF(+b.dataset.nf));
+  document.getElementById("dashboard").innerHTML = [
+    ["CORTES NO MÊS", d.length],
+    ["TOTAL GASTO", money(total)],
+    ["PAGOS", paid.length],
+    ["PENDENTES", pending.length],
+    ["JÁ PAGO", money(paidTotal)]
+  ].map(x => `
+    <div class="kpi">
+      <span>${x[0]}</span>
+      <b>${x[1]}</b>
+    </div>
+  `).join("");
 }
 
-function rowHtml(c){
-  const paid=isPaid(c);
-  return `<div class="row">
-    <div class="flex justify-between items-start gap-2">
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2 flex-wrap">
-          <span class="font-display text-lg text-gold">${escapeHtml(c.Data)}</span>
-          <span class="chip ${paid?"chip-paid":"chip-pend"}">${paid?"Pago":"Pendente"}</span>
+function renderPending(){
+  const pending = filteredRows().filter(r => String(r["Status"]).toLowerCase() !== "pago");
+  document.getElementById("pendingCount").textContent = pending.length;
+  const box = document.getElementById("pendingList");
+  if(!pending.length){
+    box.innerHTML = `<p class="muted">Não há pendências neste mês.</p>`;
+    return;
+  }
+
+  box.innerHTML = pending.map(r => cardHTML(r, true)).join("");
+}
+
+function renderHistory(){
+  const filter = document.getElementById("historyFilter").value;
+  const d = filteredRows().filter(r => filter === "ALL" ? true : String(r["Status"]) === filter);
+  document.getElementById("historyCount").textContent = d.length;
+  document.getElementById("historyBody").innerHTML = d.map(r => rowHTML(r)).join("");
+}
+
+function renderAll(){
+  currentMonth = document.getElementById("monthFilter").value;
+  renderDashboard();
+  renderPending();
+  renderHistory();
+}
+
+function cardHTML(r, isPending){
+  const id = r["Id"];
+  return `
+    <div class="card" style="margin:10px 0">
+      <div class="sectionHead">
+        <div>
+          <b>#${id} - ${r["Tipo de Corte"] || ""}</b>
+          <div class="muted">${r["Data"] || ""} • ${money(r["Preço"])}</div>
         </div>
-        <div class="text-sm mt-1">${escapeHtml(c["Tipo de Corte"])}</div>
-        <div class="text-xs mt-1" style="color:var(--muted)">${brl(priceOf(c))} ${c["Data Pagamento"]?"• Pago em "+escapeHtml(c["Data Pagamento"]):""}</div>
-        ${c["Observações"]?`<div class="text-xs mt-1" style="color:var(--muted)">📝 ${escapeHtml(c["Observações"])}</div>`:""}
-        ${c["Nota Fiscal"]?`<div class="text-xs mt-1" style="color:var(--muted)">🧾 ${escapeHtml(String(c["Nota Fiscal"]).slice(0,60))}${String(c["Nota Fiscal"]).length>60?"...":""}</div>`:""}
+        <span class="badge">${r["Status"] || ""}</span>
       </div>
-      <div class="flex flex-col gap-1">
-        ${!paid?`<button data-pay="${c.Id}" class="gold-btn px-2 py-1 rounded text-xs">Pagar</button>`:""}
-        <button data-nf="${c.Id}" class="ghost-btn px-2 py-1 rounded text-xs">Nota</button>
-        <button data-del="${c.Id}" class="danger-btn px-2 py-1 rounded text-xs">×</button>
+
+      <div class="muted small">${r["Observações"] || ""}</div>
+
+      <div class="row" style="margin-top:12px">
+        <input id="nf_${id}" placeholder="Inserir código da nota fiscal" value="${r["Nota Fiscal"] || ""}" />
+        <input id="file_${id}" type="file" accept="image/*,application/pdf" />
+        <input id="obs_${id}" placeholder="Atualizar observações" value="${r["Observações"] || ""}" />
+      </div>
+
+      <div class="actions" style="margin-top:10px">
+        <button class="btn-green" onclick="confirmPayment('${id}')">Confirmar pagamento</button>
+        <button class="btn-dark" onclick="saveInvoice('${id}')">Inserir NF</button>
+        <button class="btn-dark" onclick="uploadProof('${id}')">Enviar foto do comprovante PIX</button>
+        <button class="btn-red" onclick="deleteCut('${id}')">Excluir corte</button>
       </div>
     </div>
-  </div>`;
+  `;
 }
 
-/* ============== MODAL ============== */
-function showModal(html){
-  $("#modal-root").innerHTML=`<div class="modal-bg"><div class="modal">${html}</div></div>`;
-  $("#modal-root .modal-bg").addEventListener("click",e=>{if(e.target.classList.contains("modal-bg"))closeModal();});
+function rowHTML(r){
+  const id = r["Id"];
+  const proof = r["Comprovante"] || r["Link Comprovante"] || "";
+  return `
+    <tr>
+      <td>${id}</td>
+      <td>${r["Data"] || ""}</td>
+      <td>${r["Tipo de Corte"] || ""}</td>
+      <td>${money(r["Preço"])}</td>
+      <td><span class="badge">${r["Status"] || ""}</span></td>
+      <td>${r["Data Pagamento"] || ""}</td>
+      <td>${r["Nota Fiscal"] || ""}</td>
+      <td>${r["Observações"] || ""}</td>
+      <td>${proof ? `<a href="${proof}" target="_blank">Abrir</a>` : "-"}</td>
+      <td>
+        <div class="actions" style="grid-template-columns:1fr;min-width:180px">
+          <button class="btn-green" onclick="confirmPayment('${id}')">Pagar</button>
+          <button class="btn-dark" onclick="saveInvoice('${id}')">NF</button>
+          <button class="btn-red" onclick="deleteCut('${id}')">Excluir</button>
+        </div>
+      </td>
+    </tr>
+  `;
 }
-function closeModal(){$("#modal-root").innerHTML="";}
 
-function askPassword(cb){
-  showModal(`
-    <h3 class="font-display text-2xl text-gold mb-3">Confirmar ação</h3>
-    <form id="pwf">
-      <label>Senha</label>
-      <input type="password" id="pwa" autofocus required/>
-      <div class="flex gap-2 mt-4">
-        <button type="button" class="ghost-btn flex-1 py-2 rounded-lg" onclick="closeModal()">Cancelar</button>
-        <button class="gold-btn flex-1 py-2 rounded-lg">Confirmar</button>
-      </div>
-    </form>`);
-  $("#pwf").onsubmit=e=>{
-    e.preventDefault();
-    if($("#pwa").value===PASS_ACTION){closeModal();cb();}
-    else toast("Senha incorreta","err");
+async function refreshData(){
+  const j = await api({ action: "read" });
+  rows = j.data || [];
+  normalizeMonthOptions();
+  renderAll();
+}
+
+async function addCut(){
+  if(document.getElementById("adminPass").value !== ADMIN_PASS) return alert("Senha inválida.");
+  const [tipo, preco] = document.getElementById("cutType").value.split("|");
+  const params = {
+    action: "add",
+    data: document.getElementById("cutDate").value || todayISO(),
+    tipoCorte: tipo,
+    preco: preco,
+    status: document.getElementById("cutPaidNow").checked ? "Pago" : "Pendente",
+    dataPagamento: document.getElementById("cutPaidNow").checked ? dateBR() : "",
+    notaFiscal: "",
+    observacoes: document.getElementById("cutObs").value || ""
   };
+  const j = await api(params);
+  if(j.success){
+    await refreshData();
+    alert("Corte adicionado.");
+  } else {
+    alert(j.error || "Erro ao adicionar.");
+  }
 }
 
-function openAddDialog(){
-  showModal(`
-    <h3 class="font-display text-2xl text-gold mb-3">Novo corte</h3>
-    <form id="addf" class="space-y-3">
-      <div><label>Data (dd/mm/aaaa)</label><input id="f-data" value="${todayBR()}" required/></div>
-      <div><label>Tipo de corte</label>
-        <select id="f-tipo">${HAIRCUT_TABLE.map(h=>`<option value="${h.name}|${h.price}">${h.name} — ${brl(h.price)}</option>`).join("")}</select>
-      </div>
-      <div><label>Preço (R$)</label><input id="f-preco" type="number" step="0.01" value="${HAIRCUT_TABLE[5].price}" required/></div>
-      <div><label>Status</label>
-        <select id="f-status"><option value="Pendente">Pendente</option><option value="Pago">Pago</option></select>
-      </div>
-      <div><label>Observações</label><textarea id="f-obs" rows="2"></textarea></div>
-      <div class="flex gap-2 pt-2">
-        <button type="button" class="ghost-btn flex-1 py-2 rounded-lg" onclick="closeModal()">Cancelar</button>
-        <button class="gold-btn flex-1 py-2 rounded-lg" id="add-submit">Salvar</button>
-      </div>
-    </form>`);
-  $("#f-tipo").onchange=e=>{const p=e.target.value.split("|")[1];$("#f-preco").value=p;};
-  $("#addf").onsubmit=async e=>{
-    e.preventDefault();
-    const btn=$("#add-submit");btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
-    try{
-      const tipo=$("#f-tipo").value.split("|")[0];
-      const status=$("#f-status").value;
-      const r=await api.add({data:$("#f-data").value,tipoCorte:tipo,preco:$("#f-preco").value,status,dataPagamento:status==="Pago"?todayBR():"",observacoes:$("#f-obs").value});
-      if(r.success){toast("Corte adicionado!");closeModal();await loadData();}
-      else toast(r.error||"Erro","err");
-    }catch(e){toast(e.message,"err");}
-    finally{btn.disabled=false;btn.textContent="Salvar";}
+async function confirmPayment(id){
+  if(document.getElementById("adminPass").value !== ADMIN_PASS) return alert("Senha inválida.");
+  const j = await api({
+    action: "updatePayment",
+    id: id,
+    dataPagamento: dateBR()
+  });
+  if(j.success){
+    await refreshData();
+    alert("Pagamento confirmado.");
+  } else {
+    alert(j.error || "Erro ao confirmar.");
+  }
+}
+
+async function saveInvoice(id){
+  if(document.getElementById("adminPass").value !== ADMIN_PASS) return alert("Senha inválida.");
+  const nf = document.getElementById("nf_" + id).value || "";
+  const obs = document.getElementById("obs_" + id).value || "";
+  const j = await api({
+    action: "updateInvoice",
+    id: id,
+    notaFiscal: nf,
+    observacoes: obs
+  });
+  if(j.success){
+    await refreshData();
+    alert("Nota fiscal salva.");
+  } else {
+    alert(j.error || "Erro ao salvar NF.");
+  }
+}
+
+async function deleteCut(id){
+  if(document.getElementById("adminPass").value !== ADMIN_PASS) return alert("Senha inválida.");
+  if(!confirm("Excluir este corte e remover da planilha?")) return;
+  const j = await api({ action: "deleteRow", id: id });
+  if(j.success){
+    await refreshData();
+    alert("Corte excluído.");
+  } else {
+    alert(j.error || "Erro ao excluir.");
+  }
+}
+
+async function uploadProof(id){
+  if(document.getElementById("adminPass").value !== ADMIN_PASS) return alert("Senha inválida.");
+  const fileInput = document.getElementById("file_" + id);
+  const file = fileInput.files[0];
+  if(!file) return alert("Selecione um arquivo ou imagem.");
+
+  const reader = new FileReader();
+  reader.onload = async function(e){
+    const payload = {
+      action: "uploadProof",
+      id: id,
+      filename: file.name,
+      mimeType: file.type,
+      bytes: Array.from(new Int8Array(e.target.result))
+    };
+    const j = await api({
+      action: "uploadProof",
+      id: id,
+      filename: file.name,
+      mimeType: file.type,
+      bytes: btoa(String.fromCharCode(...new Uint8Array(e.target.result)))
+    });
+    if(j.success){
+      await refreshData();
+      alert("Comprovante enviado.");
+    } else {
+      alert(j.error || "Erro ao enviar comprovante.");
+    }
   };
+  reader.readAsArrayBuffer(file);
 }
 
-async function markPaid(id){
-  try{
-    const r=await api.updatePayment(id,todayBR());
-    if(r.success){toast("Pagamento registrado!");await loadData();}else toast(r.error||"Erro","err");
-  }catch(e){toast(e.message,"err");}
-}
-async function delCut(id){
-  if(!confirm("Excluir este corte?"))return;
-  try{
-    const r=await api.deleteRow(id);
-    if(r.success){toast("Excluído!");await loadData();}else toast(r.error||"Erro","err");
-  }catch(e){toast(e.message,"err");}
+function downloadMonth(){
+  const d = filteredRows();
+  const header = ["Id","Data","Tipo de Corte","Preço","Status","Data Pagamento","Nota Fiscal","Observações","Comprovante"];
+  const csv = [
+    header.join(","),
+    ...d.map(r => [
+      r["Id"],
+      r["Data"],
+      `"${String(r["Tipo de Corte"] || "").replace(/"/g,'""')}"`,
+      r["Preço"],
+      r["Status"],
+      r["Data Pagamento"] || "",
+      r["Nota Fiscal"] || "",
+      `"${String(r["Observações"] || "").replace(/"/g,'""')}"`,
+      r["Comprovante"] || r["Link Comprovante"] || ""
+    ].join(","))
+  ].join("\\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `cortes_${currentMonth === "ALL" ? "todos" : currentMonth}.csv`;
+  a.click();
 }
 
-function openNF(id){
-  const c=state.cuts.find(x=>x.Id===id);if(!c)return;
-  showModal(`
-    <h3 class="font-display text-2xl text-gold mb-3">Nota fiscal / PIX</h3>
-    <p class="text-xs mb-2" style="color:var(--muted)">Corte de ${escapeHtml(c.Data)} — ${brl(priceOf(c))}</p>
-    <form id="nff">
-      <label>Código PIX / observação do comprovante</label>
-      <textarea id="nf-val" rows="4">${escapeHtml(c["Nota Fiscal"]||"")}</textarea>
-      <div class="flex gap-2 mt-4">
-        <button type="button" class="ghost-btn flex-1 py-2 rounded-lg" onclick="closeModal()">Cancelar</button>
-        <button class="gold-btn flex-1 py-2 rounded-lg" id="nf-submit">Salvar</button>
-      </div>
-    </form>`);
-  $("#nff").onsubmit=async e=>{
-    e.preventDefault();
-    const btn=$("#nf-submit");btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
-    try{
-      const r=await api.updateInvoice(id,$("#nf-val").value);
-      if(r.success){toast("Nota salva!");closeModal();await loadData();}else toast(r.error||"Erro","err");
-    }catch(e){toast(e.message,"err");}
-    finally{btn.disabled=false;btn.textContent="Salvar";}
-  };
+if(localStorage.getItem("cc_login") === "1"){
+  document.getElementById("loginView").classList.add("hidden");
+  document.getElementById("appView").classList.remove("hidden");
+  loadCutOptions();
+  setDefaultDate();
+  refreshData();
+} else {
+  loadCutOptions();
+  setDefaultDate();
 }
-
-function openSettings(){
-  showModal(`
-    <h3 class="font-display text-2xl text-gold mb-3">Configurações</h3>
-    <form id="cfgf">
-      <label>WhatsApp do Hugo (com DDI+DDD, ex: 5531999999999)</label>
-      <input id="cfg-hugo" value="${escapeHtml(state.hugo)}" placeholder="5531999999999"/>
-      <div class="flex gap-2 mt-4">
-        <button type="button" class="ghost-btn flex-1 py-2 rounded-lg" onclick="closeModal()">Cancelar</button>
-        <button class="gold-btn flex-1 py-2 rounded-lg">Salvar</button>
-      </div>
-    </form>`);
-  $("#cfgf").onsubmit=e=>{
-    e.preventDefault();
-    state.hugo=$("#cfg-hugo").value.replace(/\D/g,"");
-    localStorage.setItem("cc_hugo",state.hugo);
-    toast("Salvo!");closeModal();
-  };
-}
-
-function sendResumoWpp(){
-  const filtered=state.cuts.filter(c=>inMonth(c,state.year,state.month));
-  const total=filtered.reduce((s,c)=>s+priceOf(c),0);
-  const pend=filtered.filter(c=>!isPaid(c));
-  const pendTotal=pend.reduce((s,c)=>s+priceOf(c),0);
-  let txt=`*Resumo ${MONTHS_PT[state.month]}/${state.year}*\n`;
-  txt+=`Total de cortes: ${filtered.length}\n`;
-  txt+=`Total: ${brl(total)}\n`;
-  txt+=`Pendente: ${brl(pendTotal)}\n\n`;
-  if(pend.length){txt+=`*Cortes em aberto:*\n`;pend.forEach(c=>{txt+=`• ${c.Data} — ${c["Tipo de Corte"]} — ${brl(priceOf(c))}\n`;});}
-  const url=state.hugo?`https://wa.me/${state.hugo}?text=${encodeURIComponent(txt)}`:`https://wa.me/?text=${encodeURIComponent(txt)}`;
-  window.open(url,"_blank");
-}
-
-function openInvoice(){
-  const filtered=state.cuts.filter(c=>inMonth(c,state.year,state.month)).sort((a,b)=>(parseBR(a.Data)||0)-(parseBR(b.Data)||0));
-  const total=filtered.reduce((s,c)=>s+priceOf(c),0);
-  const paid=filtered.filter(isPaid).reduce((s,c)=>s+priceOf(c),0);
-  const w=window.open("","_blank");
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Nota — ${MONTHS_PT[state.month]} ${state.year}</title>
-    <style>body{font-family:system-ui;padding:2rem;max-width:780px;margin:auto;color:#222}
-    h1{font-family:'Bebas Neue',sans-serif;color:#b78a2e;margin:0}table{width:100%;border-collapse:collapse;margin-top:1rem}
-    th,td{border-bottom:1px solid #ddd;padding:.5rem;text-align:left;font-size:14px}
-    .tot{margin-top:1rem;font-size:1.1rem}.r{text-align:right}@media print{button{display:none}}</style></head>
-    <body><h1>CONTROLE DE CORTE</h1><div>Resumo de ${MONTHS_PT[state.month]} ${state.year}</div>
-    <table><thead><tr><th>Data</th><th>Tipo</th><th>Status</th><th class="r">Valor</th></tr></thead>
-    <tbody>${filtered.map(c=>`<tr><td>${c.Data}</td><td>${c["Tipo de Corte"]}</td><td>${isPaid(c)?"Pago":"Pendente"}</td><td class="r">${brl(priceOf(c))}</td></tr>`).join("")}</tbody></table>
-    <div class="tot"><b>Cortes:</b> ${filtered.length} &nbsp; <b>Total:</b> ${brl(total)} &nbsp; <b>Pago:</b> ${brl(paid)} &nbsp; <b>Pendente:</b> ${brl(total-paid)}</div>
-    <div style="margin-top:2rem"><button onclick="window.print()">Imprimir / Salvar PDF</button></div></body></html>`);
-  w.document.close();
-}
-
-/* ============== BOOT ============== */
-window.closeModal=closeModal;
-render();
-if(state.authed)loadData();
 </script>
 </body>
 </html>
